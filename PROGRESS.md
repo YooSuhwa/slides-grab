@@ -29,3 +29,7 @@
 - Title: VLM 기반 사용자 스타일 추출
 - Attempts: 1
 
+## US-007 — PASS (2026-02-27T15:10:48Z)
+- Title: VLM 기반 사용자 스타일 추출
+- Attempts: 1
+

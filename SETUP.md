@@ -1,19 +1,14 @@
-# ppt-team-agent
+# Setup
 
-Agent-first PPT framework.  
-HTML 슬라이드를 직접 작성하고, Planning -> Design -> Conversion 파이프라인으로 PPTX/PDF를 생성합니다.
+`ppt-team-agent` 실행을 위한 복붙 가능한 설치 가이드입니다.
 
-## Setup (Copy/Paste)
-
-`SETUP.md`의 설치 명령을 그대로 포함했습니다.
-
-### 1) 저장소 클론
+## 1) 저장소 클론
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/ppt_team_agent.git && cd ppt_team_agent
 ```
 
-### 2) OS별 원라이너 설치
+## 2) OS별 원라이너 설치
 
 macOS (Homebrew):
 
@@ -33,31 +28,8 @@ Windows (winget, PowerShell):
 winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements; winget install -e --id Git.Git --accept-package-agreements --accept-source-agreements; npm ci; npx playwright install chromium
 ```
 
-### 3) CLI 확인
+## 3) CLI 동작 확인
 
 ```bash
 npm exec -- ppt-agent --help
-```
-
-## CLI
-
-```bash
-ppt-agent build-viewer
-ppt-agent validate
-ppt-agent convert
-```
-
-Local 개발 환경에서는 아래처럼 실행해도 됩니다.
-
-```bash
-node bin/ppt-agent.js --help
-```
-
-## npm Scripts
-
-```bash
-npm run build-viewer
-npm run validate
-npm run convert
-npm run html2pptx
 ```

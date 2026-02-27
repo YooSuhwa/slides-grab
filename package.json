@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "description": "PPT Team Agent - Claude Code Sub-Agent and Skill based presentation generator",
   "type": "module",
+  "bin": {
+    "ppt-agent": "./bin/ppt-agent.js"
+  },
   "scripts": {
     "html2pptx": "node .claude/skills/pptx-skill/scripts/html2pptx.js",
     "build-viewer": "node scripts/build-viewer.js",
+    "validate": "node scripts/validate-slides.js",
+    "convert": "node convert.cjs",
     "extract-style": "node scripts/extract-style.js"
   },
   "dependencies": {
@@ -13,6 +18,7 @@
     "@ai-sdk/google": "^3.0.33",
     "@ai-sdk/openai": "^3.0.36",
     "ai": "^6.0.103",
+    "commander": "^12.1.0",
     "pdf-lib": "^1.17.1",
     "playwright": "^1.40.0",
     "pptxgenjs": "^3.12.0",

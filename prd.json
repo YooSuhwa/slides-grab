@@ -128,7 +128,7 @@
         "REQ-048 \ubaa8\ub4e0 SKILL.md \ud30c\uc77c\uc5d0 agentskills.io \ud45c\uc900 frontmatter(name, description)\uac00 \ud3ec\ud568\ub41c\ub2e4"
       ],
       "priority": 8,
-      "passes": false,
+      "passes": true,
       "notes": ""
     }
   ]
