@@ -43,3 +43,7 @@ ENV/
 # PPT temporary files
 ~$*.ppt*
 
+# Generated slides and viewer
+slides/
+*.pptx
+

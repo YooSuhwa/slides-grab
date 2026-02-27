@@ -4,7 +4,8 @@
   "description": "PPT Team Agent - Claude Code Sub-Agent and Skill based presentation generator",
   "type": "module",
   "scripts": {
-    "html2pptx": "node .claude/skills/pptx-skill/scripts/html2pptx.js"
+    "html2pptx": "node .claude/skills/pptx-skill/scripts/html2pptx.js",
+    "build-viewer": "node scripts/build-viewer.js"
   },
   "dependencies": {
     "pptxgenjs": "^3.12.0",
