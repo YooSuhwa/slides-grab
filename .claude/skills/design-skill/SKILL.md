@@ -281,6 +281,12 @@ grid-template-columns: 1fr 2.3fr;
 ### 10. 마무리 슬라이드 (Closing)
 - 템플릿 파일: `templates/closing.html`
 
+### 11. 차트 슬라이드 (Chart)
+- 템플릿 파일: `templates/chart.html`
+
+### 12. 다이어그램 슬라이드 (Diagram)
+- 템플릿 파일: `templates/diagram.html`
+
 ### 커스텀 템플릿
 - 커스텀 템플릿 저장 경로: `templates/custom/`
 - 사용자가 템플릿 파일을 drop-in 방식으로 추가하여 재사용할 수 있습니다.
@@ -328,6 +334,142 @@ grid-template-columns: 1fr 3fr;
   box-shadow: 0 2pt 8pt rgba(0,0,0,0.08);
 "></div>
 ```
+
+---
+
+## 차트/다이어그램/이미지 라이브러리 가이드
+
+### 1. Chart.js 사용 (Bar / Line / Pie)
+
+#### CDN 링크
+```html
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+```
+
+#### 사용 예시
+```html
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16pt;">
+  <div style="border: 1px solid #e5e5e0; border-radius: 10pt; padding: 10pt;">
+    <p style="font-size: 10pt; margin-bottom: 6pt;">Bar Chart</p>
+    <canvas id="barChart" style="width: 100%; height: 120pt;"></canvas>
+  </div>
+  <div style="border: 1px solid #e5e5e0; border-radius: 10pt; padding: 10pt;">
+    <p style="font-size: 10pt; margin-bottom: 6pt;">Line Chart</p>
+    <canvas id="lineChart" style="width: 100%; height: 120pt;"></canvas>
+  </div>
+  <div style="border: 1px solid #e5e5e0; border-radius: 10pt; padding: 10pt;">
+    <p style="font-size: 10pt; margin-bottom: 6pt;">Pie Chart</p>
+    <canvas id="pieChart" style="width: 100%; height: 120pt;"></canvas>
+  </div>
+</div>
+
+<script>
+  const labels = ['Q1', 'Q2', 'Q3', 'Q4'];
+  const values = [12, 19, 15, 23];
+
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: ['#1f2937', '#2563eb', '#10b981', '#f59e0b'] }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false }
+  });
+
+  new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: { labels, datasets: [{ data: values, borderColor: '#2563eb', backgroundColor: '#93c5fd', fill: true }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false }
+  });
+
+  new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: { labels, datasets: [{ data: [35, 28, 22, 15], backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444'] }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false }
+  });
+</script>
+```
+
+권장 사항:
+- PPT 변환 안정성을 위해 `options.animation: false`를 사용하세요.
+- `canvas`는 명시적인 너비/높이를 지정하세요.
+
+### 2. Mermaid 사용 (Flowchart / Sequence Diagram)
+
+#### CDN 링크
+```html
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+```
+
+#### 사용 예시
+```html
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20pt;">
+  <div style="border: 1px solid #e5e5e0; border-radius: 10pt; padding: 10pt;">
+    <p style="font-size: 10pt; margin-bottom: 6pt;">Flowchart</p>
+    <pre class="mermaid">
+flowchart LR
+  A[Plan] --> B[Design]
+  B --> C[Review]
+  C --> D[Convert]
+    </pre>
+  </div>
+  <div style="border: 1px solid #e5e5e0; border-radius: 10pt; padding: 10pt;">
+    <p style="font-size: 10pt; margin-bottom: 6pt;">Sequence Diagram</p>
+    <pre class="mermaid">
+sequenceDiagram
+  participant U as User
+  participant A as Agent
+  U->>A: Request slide
+  A->>U: Return HTML
+    </pre>
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, securityLevel: 'loose' });
+</script>
+```
+
+권장 사항:
+- Mermaid DSL은 `<pre class="mermaid">` 내부에 작성하세요.
+- 다이어그램 컨테이너의 크기를 고정하면 레이아웃이 안정적입니다.
+
+### 3. 인라인 SVG 아이콘 작성 가이드
+
+```html
+<div style="display: flex; align-items: center; gap: 8pt;">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M5 12h14M12 5l7 7-7 7" stroke="#1f2937" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+  </svg>
+  <p style="font-size: 12pt; color: #1f2937;">Next step</p>
+</div>
+```
+
+작성 규칙:
+- `viewBox`를 반드시 지정하세요.
+- 크기는 `width`/`height`로 명시하세요.
+- 색상은 `stroke`/`fill`에 `#`가 포함된 HEX 값을 사용하세요.
+- 텍스트는 SVG 밖에서 `<p>`, `<h1>-<h6>` 태그로 작성하세요.
+
+### 4. 이미지 사용 규칙 (로컬 경로 / URL / 플레이스홀더)
+
+#### 로컬 경로 이미지
+```html
+<img src="/Users/yourname/projects/assets/team-photo.png" alt="Team photo" style="width: 220pt; height: 140pt; object-fit: cover;">
+```
+
+#### URL 이미지
+```html
+<img src="https://images.example.com/hero.png" alt="Hero image" style="width: 220pt; height: 140pt; object-fit: cover;">
+```
+
+#### 플레이스홀더 (이미지 대체 영역)
+```html
+<div data-image-placeholder style="width: 220pt; height: 140pt; border: 1px dashed #c7c7c7; background: #f3f4f6;"></div>
+```
+
+사용 규칙:
+- `img`에는 항상 `alt`를 포함하세요.
+- 로컬 경로를 우선 사용하고, URL 이미지는 네트워크 실패 가능성을 고려하세요.
+- 이미지가 아직 없으면 `data-image-placeholder`로 자리만 먼저 확보하세요.
+- 고해상도 원본 사용 후 `object-fit`으로 프레임을 맞추세요.
 
 ---
 

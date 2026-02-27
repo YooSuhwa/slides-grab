@@ -47,7 +47,7 @@
         "REQ-017 \ubc18\ud658\uac12\uc740 `{ content: string, usage: { inputTokens, outputTokens } }` \ud615\ud0dc\uc774\ub2e4"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -64,7 +64,7 @@
         "REQ-024 html2pptx.js(\ub610\ub294 \uad00\ub828 \ubcc0\ud658 \uc2a4\ud06c\ub9bd\ud2b8)\uc5d0\uc11c Chart.js/Mermaid \ub80c\ub354\ub9c1 \uc644\ub8cc\ub97c \ub300\uae30\ud558\ub294 \ub85c\uc9c1\uc774 \uc788\ub2e4"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {

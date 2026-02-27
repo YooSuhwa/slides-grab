@@ -33,6 +33,187 @@ const PT_PER_PX = 0.75;
 const PX_PER_IN = 96;
 const EMU_PER_IN = 914400;
 
+async function launchBrowser(tmpDir) {
+  const launchOptions = { env: { TMPDIR: tmpDir } };
+
+  if (process.platform !== 'darwin') {
+    return chromium.launch(launchOptions);
+  }
+
+  try {
+    return await chromium.launch({ ...launchOptions, channel: 'chrome' });
+  } catch (error) {
+    if (error && typeof error.message === 'string' && error.message.includes("Chromium distribution 'chrome' is not found")) {
+      return chromium.launch(launchOptions);
+    }
+    throw error;
+  }
+}
+
+async function waitForDynamicLibraryRender(page, timeout = 5000) {
+  await page.evaluate(async () => {
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
+  });
+
+  const hasCanvas = await page.evaluate(() => document.querySelector('canvas') !== null);
+  if (hasCanvas) {
+    await page.evaluate(() => {
+      if (!window.Chart || !window.Chart.instances) return;
+      const instances = Array.isArray(window.Chart.instances)
+        ? window.Chart.instances
+        : Object.values(window.Chart.instances);
+
+      for (const chart of instances) {
+        if (!chart) continue;
+        if (chart.options) chart.options.animation = false;
+        if (typeof chart.update === 'function') {
+          try {
+            chart.update('none');
+          } catch (_) {
+            // noop
+          }
+        }
+      }
+    });
+
+    try {
+      await page.waitForFunction(() => {
+        const canvases = Array.from(document.querySelectorAll('canvas'));
+        if (canvases.length === 0) return true;
+
+        const instances = (window.Chart && window.Chart.instances)
+          ? (Array.isArray(window.Chart.instances) ? window.Chart.instances : Object.values(window.Chart.instances))
+          : [];
+
+        return canvases.every((canvas) => {
+          const rect = canvas.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) return false;
+
+          const matchedChart = instances.find((instance) => instance && instance.canvas === canvas);
+          if (!matchedChart) return true;
+          return matchedChart.animating === false;
+        });
+      }, null, { timeout });
+    } catch (_) {
+      // Keep conversion resilient even when chart animation state is unavailable.
+    }
+  }
+
+  const hasMermaid = await page.evaluate(() => document.querySelector('.mermaid') !== null);
+  if (hasMermaid) {
+    await page.evaluate(async () => {
+      if (!window.mermaid) return;
+
+      try {
+        if (typeof window.mermaid.run === 'function') {
+          await window.mermaid.run({ querySelector: '.mermaid' });
+          return;
+        }
+
+        if (typeof window.mermaid.init === 'function') {
+          await window.mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+        }
+      } catch (_) {
+        // noop
+      }
+    });
+
+    try {
+      await page.waitForFunction(() => {
+        const blocks = Array.from(document.querySelectorAll('.mermaid'));
+        if (blocks.length === 0) return true;
+        return blocks.every((block) => block.querySelector('svg') !== null);
+      }, null, { timeout });
+    } catch (_) {
+      // Keep conversion resilient when Mermaid CDN/script is unavailable.
+    }
+  }
+}
+
+async function rasterizeDynamicVisuals(page) {
+  await page.evaluate(async () => {
+    const waitForImageLoad = (img) => new Promise((resolve) => {
+      if (img.complete) {
+        resolve();
+        return;
+      }
+
+      const done = () => resolve();
+      img.addEventListener('load', done, { once: true });
+      img.addEventListener('error', done, { once: true });
+    });
+
+    const canvasList = Array.from(document.querySelectorAll('canvas'));
+    for (const canvas of canvasList) {
+      try {
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) continue;
+
+        const dataUrl = canvas.toDataURL('image/png');
+        if (!dataUrl || dataUrl === 'data:,') continue;
+
+        const computed = window.getComputedStyle(canvas);
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.alt = canvas.getAttribute('aria-label') || 'chart';
+        img.style.width = `${rect.width}px`;
+        img.style.height = `${rect.height}px`;
+        img.style.display = computed.display === 'inline' ? 'inline-block' : computed.display;
+        img.style.objectFit = 'contain';
+        if (canvas.className) img.className = canvas.className;
+        if (canvas.id) img.id = `${canvas.id}-rendered`;
+
+        canvas.replaceWith(img);
+        await waitForImageLoad(img);
+      } catch (_) {
+        // noop
+      }
+    }
+
+    const svgList = Array.from(document.querySelectorAll('svg'));
+    for (const svg of svgList) {
+      try {
+        const rect = svg.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) continue;
+
+        const clone = svg.cloneNode(true);
+        if (!clone.getAttribute('xmlns')) {
+          clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        }
+        if (!clone.getAttribute('xmlns:xlink')) {
+          clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+        }
+        if (!clone.getAttribute('width')) {
+          clone.setAttribute('width', `${Math.max(1, Math.round(rect.width))}`);
+        }
+        if (!clone.getAttribute('height')) {
+          clone.setAttribute('height', `${Math.max(1, Math.round(rect.height))}`);
+        }
+
+        const serialized = new XMLSerializer().serializeToString(clone);
+        const base64Svg = btoa(unescape(encodeURIComponent(serialized)));
+        const dataUrl = `data:image/svg+xml;base64,${base64Svg}`;
+
+        const computed = window.getComputedStyle(svg);
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.alt = 'diagram';
+        img.style.width = `${rect.width}px`;
+        img.style.height = `${rect.height}px`;
+        img.style.display = computed.display === 'inline' ? 'inline-block' : computed.display;
+        img.style.objectFit = 'contain';
+
+        svg.replaceWith(img);
+        await waitForImageLoad(img);
+      } catch (_) {
+        // noop
+      }
+    }
+  });
+}
+
 // Helper: Get body dimensions and check for overflow
 async function getBodyDimensions(page) {
   const bodyDimensions = await page.evaluate(() => {
@@ -133,14 +314,24 @@ async function addBackground(slideData, targetSlide, tmpDir) {
 function addElements(slideData, targetSlide, pres) {
   for (const el of slideData.elements) {
     if (el.type === 'image') {
-      let imagePath = el.src.startsWith('file://') ? el.src.replace('file://', '') : el.src;
-      targetSlide.addImage({
-        path: imagePath,
-        x: el.position.x,
-        y: el.position.y,
-        w: el.position.w,
-        h: el.position.h
-      });
+      if (el.src.startsWith('data:')) {
+        targetSlide.addImage({
+          data: el.src.replace(/^data:/, ''),
+          x: el.position.x,
+          y: el.position.y,
+          w: el.position.w,
+          h: el.position.h
+        });
+      } else {
+        let imagePath = el.src.startsWith('file://') ? el.src.replace('file://', '') : el.src;
+        targetSlide.addImage({
+          path: imagePath,
+          x: el.position.x,
+          y: el.position.y,
+          w: el.position.w,
+          h: el.position.h
+        });
+      }
     } else if (el.type === 'line') {
       targetSlide.addShape(pres.ShapeType.line, {
         x: el.x1,
@@ -900,13 +1091,7 @@ async function html2pptx(htmlFile, pres, options = {}) {
   } = options;
 
   try {
-    // Use Chrome on macOS, default Chromium on Unix
-    const launchOptions = { env: { TMPDIR: tmpDir } };
-    if (process.platform === 'darwin') {
-      launchOptions.channel = 'chrome';
-    }
-
-    const browser = await chromium.launch(launchOptions);
+    const browser = await launchBrowser(tmpDir);
 
     let bodyDimensions;
     let slideData;
@@ -922,6 +1107,8 @@ async function html2pptx(htmlFile, pres, options = {}) {
       });
 
       await page.goto(`file://${filePath}`);
+      await waitForDynamicLibraryRender(page);
+      await rasterizeDynamicVisuals(page);
 
       bodyDimensions = await getBodyDimensions(page);
 
