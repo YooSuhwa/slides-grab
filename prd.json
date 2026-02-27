@@ -80,7 +80,7 @@
         "REQ-030 US-003\uc758 `analyzeImage()` \ud568\uc218\ub97c \uc0ac\uc6a9\ud55c\ub2e4"
       ],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
