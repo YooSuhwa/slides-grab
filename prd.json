@@ -15,7 +15,7 @@
         "REQ-005 `templates/custom/` \ub514\ub809\ud1a0\ub9ac\uac00 \uc874\uc7ac\ud558\uace0, \uc0ac\uc6a9\uc790\uac00 \uc5ec\uae30\uc5d0 \ucee4\uc2a4\ud140 \ud15c\ud50c\ub9bf\uc744 \ucd94\uac00\ud560 \uc218 \uc788\ub2e4"
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -31,7 +31,7 @@
         "REQ-011 `slides/` \ub514\ub809\ud1a0\ub9ac\uc758 \ubaa8\ub4e0 `slide-*.html` \ud30c\uc77c\uc744 \uc790\ub3d9\uc73c\ub85c \uac80\uc99d\ud55c\ub2e4"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
