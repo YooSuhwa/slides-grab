@@ -106,6 +106,14 @@ program
     await runCommand('scripts/extract-style.js', args);
   });
 
+program
+  .command('edit')
+  .description('Start interactive slide editor with VLM feedback + agent auto-fix')
+  .argument('[args...]', 'Arguments: --port, --provider, --model, --agent')
+  .action(async (args = []) => {
+    await runCommand('scripts/editor-server.js', args);
+  });
+
 // --- Template/theme discovery commands ---
 
 program

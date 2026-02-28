@@ -19,6 +19,7 @@
     "@ai-sdk/openai": "^3.0.36",
     "ai": "^6.0.103",
     "commander": "^12.1.0",
+    "express": "^5.2.1",
     "pdf-lib": "^1.17.1",
     "playwright": "^1.40.0",
     "pptxgenjs": "^3.12.0",
