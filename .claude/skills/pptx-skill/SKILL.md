@@ -26,7 +26,7 @@ This skill is **Stage 3**. It executes only when ALL of the following conditions
 2. **HTML slides reviewed**: All HTML slides must have been reviewed and approved by the user in `viewer.html`.
 3. **No automatic execution**: Do not automatically start PPTX conversion just because slide generation is complete.
 
-If prerequisites are not met, guide the user to review slides in `slides/viewer.html` first.
+If prerequisites are not met, guide the user to review slides in `<slides-dir>/viewer.html` first (default: `slides/viewer.html`).
 
 ---
 
@@ -35,10 +35,14 @@ If prerequisites are not met, guide the user to review slides in `slides/viewer.
 ### HTML -> PPTX Conversion
 
 1. **Prepare HTML slides**
-   - Verify HTML files exist in `slides/` directory
+   - Verify HTML files exist in selected `--slides-dir` (default: `slides/`)
    - Validate each file is 720pt x 405pt (16:9) specification
 
 2. **Run html2pptx.js**
+   ```bash
+   ppt-agent convert --slides-dir <path> --output presentation.pptx
+   ```
+   - Script-level alternative:
    ```bash
    node .claude/skills/pptx-skill/scripts/html2pptx.js
    ```
@@ -60,8 +64,8 @@ const pres = new PptxGenJS();
 pres.layout = 'LAYOUT_WIDE'; // 16:9
 
 // Convert each slide
-await html2pptx('slides/slide-01.html', pres);
-await html2pptx('slides/slide-02.html', pres);
+await html2pptx('<slides-dir>/slide-01.html', pres);
+await html2pptx('<slides-dir>/slide-02.html', pres);
 
 // Save
 await pres.writeFile({ fileName: 'presentation.pptx' });
@@ -174,7 +178,7 @@ slide.addChart(pres.ChartType.line, [...], {...});
 ```
 +-------------------+
 |   HTML Slides     |
-|   slides/*.html   |
+| <slides-dir>/*.html |
 +---------+---------+
           |
           v

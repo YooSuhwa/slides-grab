@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 
@@ -14,8 +14,7 @@ const FRAME_PX = {
 const SLIDE_FILE_PATTERN = /^slide-.*\.html$/i;
 const TEXT_SELECTOR = 'p,h1,h2,h3,h4,h5,h6,li';
 const TOLERANCE_PX = 0.5;
-
-const SLIDES_DIR = join(process.cwd(), 'slides');
+const DEFAULT_SLIDES_DIR = 'slides';
 
 function toSlideOrder(fileName) {
   const match = fileName.match(/\d+/);
@@ -55,16 +54,73 @@ function summarizeSlides(slides) {
   return summary;
 }
 
-async function findSlideFiles() {
-  const entries = await readdir(SLIDES_DIR, { withFileTypes: true });
+function printUsage() {
+  process.stdout.write(
+    [
+      'Usage: node scripts/validate-slides.js [options]',
+      '',
+      'Options:',
+      `  --slides-dir <path>  Slide directory (default: ${DEFAULT_SLIDES_DIR})`,
+      '  -h, --help           Show this help message',
+    ].join('\n'),
+  );
+  process.stdout.write('\n');
+}
+
+function readOptionValue(args, index, optionName) {
+  const next = args[index + 1];
+  if (!next || next.startsWith('-')) {
+    throw new Error(`Missing value for ${optionName}.`);
+  }
+  return next;
+}
+
+function parseCliArgs(args) {
+  const options = {
+    slidesDir: DEFAULT_SLIDES_DIR,
+    help: false,
+  };
+
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+
+    if (arg === '-h' || arg === '--help') {
+      options.help = true;
+      continue;
+    }
+
+    if (arg === '--slides-dir') {
+      options.slidesDir = readOptionValue(args, i, '--slides-dir');
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--slides-dir=')) {
+      options.slidesDir = arg.slice('--slides-dir='.length);
+      continue;
+    }
+
+    throw new Error(`Unknown option: ${arg}`);
+  }
+
+  if (typeof options.slidesDir !== 'string' || options.slidesDir.trim() === '') {
+    throw new Error('--slides-dir must be a non-empty string.');
+  }
+
+  options.slidesDir = options.slidesDir.trim();
+  return options;
+}
+
+async function findSlideFiles(slidesDir) {
+  const entries = await readdir(slidesDir, { withFileTypes: true });
   return entries
     .filter((entry) => entry.isFile() && SLIDE_FILE_PATTERN.test(entry.name))
     .map((entry) => entry.name)
     .sort(sortSlideFiles);
 }
 
-async function inspectSlide(page, fileName) {
-  const slidePath = join(SLIDES_DIR, fileName);
+async function inspectSlide(page, fileName, slidesDir) {
+  const slidePath = join(slidesDir, fileName);
   const slideUrl = pathToFileURL(slidePath).href;
 
   await page.goto(slideUrl, { waitUntil: 'load' });
@@ -271,9 +327,16 @@ async function inspectSlide(page, fileName) {
 }
 
 async function main() {
-  const slideFiles = await findSlideFiles();
+  const options = parseCliArgs(process.argv.slice(2));
+  if (options.help) {
+    printUsage();
+    return;
+  }
+
+  const slidesDir = resolve(process.cwd(), options.slidesDir);
+  const slideFiles = await findSlideFiles(slidesDir);
   if (slideFiles.length === 0) {
-    throw new Error('No slide-*.html files found in slides/');
+    throw new Error(`No slide-*.html files found in: ${slidesDir}`);
   }
 
   const browser = await chromium.launch({ headless: true });
@@ -284,7 +347,7 @@ async function main() {
   try {
     for (const slideFile of slideFiles) {
       try {
-        const result = await inspectSlide(page, slideFile);
+        const result = await inspectSlide(page, slideFile, slidesDir);
         slides.push(result);
       } catch (error) {
         slides.push({

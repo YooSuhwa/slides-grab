@@ -28,7 +28,7 @@ Produce an approved `slide-outline.md` before any slide HTML generation.
 4. Repeat revisions until explicit approval.
 
 ## Rules
-- Do not generate `slides/slide-*.html` in this stage.
+- Do not generate slide HTML (`<slides-dir>/slide-*.html`) in this stage.
 - Keep scope to structure and narrative.
 - Ask for approval before moving to design.
 

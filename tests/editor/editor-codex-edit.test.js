@@ -73,6 +73,17 @@ test('buildCodexEditPrompt includes user prompt, bbox, and XPath targets', () =>
   assert.match(prompt, /Region 1/);
 });
 
+test('buildCodexEditPrompt uses explicit slide path when provided', () => {
+  const prompt = buildCodexEditPrompt({
+    slideFile: 'slide-01.html',
+    slidePath: 'presentations/demo-a/slide-01.html',
+    userPrompt: 'Increase title size.',
+    selections: [{ bbox: { x: 10, y: 12, width: 220, height: 80 }, targets: [] }],
+  });
+
+  assert.match(prompt, /Edit presentations\/demo-a\/slide-01\.html only\./);
+});
+
 test('buildCodexExecArgs attaches image and prompt to codex exec', () => {
   const args = buildCodexExecArgs({
     prompt: 'Edit slide',

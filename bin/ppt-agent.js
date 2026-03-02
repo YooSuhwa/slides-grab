@@ -12,7 +12,7 @@ const packageJson = JSON.parse(readFileSync(resolve(packageRoot, 'package.json')
 
 /**
  * Run a Node.js script from the package, with CWD set to the user's directory.
- * Scripts find slides/ in CWD, templates/themes via src/resolve.js.
+ * Scripts resolve slide paths via --slides-dir and templates/themes via src/resolve.js.
  */
 function runNodeScript(relativePath, args = []) {
   return new Promise((resolvePromise, rejectPromise) => {
@@ -60,33 +60,45 @@ program
 
 program
   .command('build-viewer')
-  .description('Build viewer.html from slides/*.html in current directory')
-  .argument('[args...]', 'Arguments to pass through')
-  .action(async (args = []) => {
+  .description('Build viewer.html from slide HTML files')
+  .option('--slides-dir <path>', 'Slide directory', 'slides')
+  .action(async (options = {}) => {
+    const args = ['--slides-dir', options.slidesDir];
     await runCommand('scripts/build-viewer.js', args);
   });
 
 program
   .command('validate')
-  .description('Run structured validation on slides (Playwright-based, no API key needed)')
-  .argument('[args...]', 'Arguments to pass through')
-  .action(async (args = []) => {
+  .description('Run structured validation on slide HTML files (Playwright-based)')
+  .option('--slides-dir <path>', 'Slide directory', 'slides')
+  .action(async (options = {}) => {
+    const args = ['--slides-dir', options.slidesDir];
     await runCommand('scripts/validate-slides.js', args);
   });
 
 program
   .command('convert')
-  .description('Convert slides to PPTX')
-  .argument('[args...]', 'Arguments to pass through')
-  .action(async (args = []) => {
+  .description('Convert slide HTML files to PPTX')
+  .option('--slides-dir <path>', 'Slide directory', 'slides')
+  .option('--output <path>', 'Output PPTX file')
+  .action(async (options = {}) => {
+    const args = ['--slides-dir', options.slidesDir];
+    if (options.output) {
+      args.push('--output', String(options.output));
+    }
     await runCommand('convert.cjs', args);
   });
 
 program
   .command('pdf')
-  .description('Convert slides to PDF')
-  .argument('[args...]', 'Arguments to pass through')
-  .action(async (args = []) => {
+  .description('Convert slide HTML files to PDF')
+  .option('--slides-dir <path>', 'Slide directory', 'slides')
+  .option('--output <path>', 'Output PDF file')
+  .action(async (options = {}) => {
+    const args = ['--slides-dir', options.slidesDir];
+    if (options.output) {
+      args.push('--output', String(options.output));
+    }
     await runCommand('scripts/html2pdf.js', args);
   });
 
@@ -94,8 +106,9 @@ program
   .command('edit')
   .description('Start interactive slide editor with Codex image-based edit flow')
   .option('--port <number>', 'Server port')
+  .option('--slides-dir <path>', 'Slide directory', 'slides')
   .action(async (options = {}) => {
-    const args = [];
+    const args = ['--slides-dir', options.slidesDir];
     if (options.port) {
       args.push('--port', String(options.port));
     }

@@ -18,6 +18,7 @@ test('parseCliArgs applies defaults for output and help', () => {
 
   assert.deepEqual(parsed, {
     output: 'slides.pdf',
+    slidesDir: 'slides',
     help: false,
   });
 });
@@ -25,10 +26,13 @@ test('parseCliArgs applies defaults for output and help', () => {
 test('parseCliArgs reads --output option', () => {
   assert.equal(parseCliArgs(['--output', 'dist/custom.pdf']).output, 'dist/custom.pdf');
   assert.equal(parseCliArgs(['--output=deck.pdf']).output, 'deck.pdf');
+  assert.equal(parseCliArgs(['--slides-dir', 'decks/product-a']).slidesDir, 'decks/product-a');
+  assert.equal(parseCliArgs(['--slides-dir=slides-q1']).slidesDir, 'slides-q1');
 });
 
 test('parseCliArgs rejects missing output value', () => {
   assert.throws(() => parseCliArgs(['--output']), /missing value/i);
+  assert.throws(() => parseCliArgs(['--slides-dir']), /missing value/i);
 });
 
 test('sortSlideFiles orders by slide number then file name', () => {

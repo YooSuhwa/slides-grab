@@ -7,10 +7,9 @@ import { chromium } from 'playwright';
 import { PDFDocument } from 'pdf-lib';
 
 const DEFAULT_OUTPUT = 'slides.pdf';
+const DEFAULT_SLIDES_DIR = 'slides';
 const SLIDE_FILE_PATTERN = /^slide-.*\.html$/i;
 const FALLBACK_SLIDE_SIZE = { width: 960, height: 540 };
-
-const SLIDES_DIR = join(process.cwd(), 'slides');
 
 function printUsage() {
   process.stdout.write(
@@ -19,6 +18,7 @@ function printUsage() {
       '',
       'Options:',
       `  --output <path>  Output PDF path (default: ${DEFAULT_OUTPUT})`,
+      `  --slides-dir <path>  Slide directory (default: ${DEFAULT_SLIDES_DIR})`,
       '  -h, --help       Show this help message',
       '',
       'Examples:',
@@ -52,6 +52,7 @@ export function sortSlideFiles(a, b) {
 export function parseCliArgs(args) {
   const options = {
     output: DEFAULT_OUTPUT,
+    slidesDir: DEFAULT_SLIDES_DIR,
     help: false,
   };
 
@@ -74,19 +75,34 @@ export function parseCliArgs(args) {
       continue;
     }
 
+    if (arg === '--slides-dir') {
+      options.slidesDir = readOptionValue(args, i, '--slides-dir');
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--slides-dir=')) {
+      options.slidesDir = arg.slice('--slides-dir='.length);
+      continue;
+    }
+
     throw new Error(`Unknown option: ${arg}`);
   }
 
   if (typeof options.output !== 'string' || options.output.trim() === '') {
     throw new Error('--output must be a non-empty string.');
   }
+  if (typeof options.slidesDir !== 'string' || options.slidesDir.trim() === '') {
+    throw new Error('--slides-dir must be a non-empty string.');
+  }
 
   options.output = options.output.trim();
+  options.slidesDir = options.slidesDir.trim();
 
   return options;
 }
 
-export async function findSlideFiles(slidesDir = SLIDES_DIR) {
+export async function findSlideFiles(slidesDir = resolve(process.cwd(), DEFAULT_SLIDES_DIR)) {
   const entries = await readdir(slidesDir, { withFileTypes: true });
   return entries
     .filter((entry) => entry.isFile() && SLIDE_FILE_PATTERN.test(entry.name))
@@ -130,8 +146,8 @@ async function getSlideSize(page) {
   };
 }
 
-async function renderSlideToPdf(page, slideFile) {
-  const slidePath = join(SLIDES_DIR, slideFile);
+async function renderSlideToPdf(page, slideFile, slidesDir) {
+  const slidePath = join(slidesDir, slideFile);
   const slideUrl = pathToFileURL(slidePath).href;
 
   await page.goto(slideUrl, { waitUntil: 'load' });
@@ -167,9 +183,10 @@ async function main() {
     return;
   }
 
-  const slideFiles = await findSlideFiles();
+  const slidesDir = resolve(process.cwd(), options.slidesDir);
+  const slideFiles = await findSlideFiles(slidesDir);
   if (slideFiles.length === 0) {
-    throw new Error('No slide-*.html files found in slides/');
+    throw new Error(`No slide-*.html files found in: ${slidesDir}`);
   }
 
   const browser = await chromium.launch({ headless: true });
@@ -178,7 +195,7 @@ async function main() {
 
   try {
     for (const slideFile of slideFiles) {
-      const slidePdf = await renderSlideToPdf(page, slideFile);
+      const slidePdf = await renderSlideToPdf(page, slideFile, slidesDir);
       slidePdfs.push(slidePdf);
     }
   } finally {

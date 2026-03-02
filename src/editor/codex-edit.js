@@ -77,15 +77,16 @@ function formatTargets(targets) {
   });
 }
 
-export function buildCodexEditPrompt({ slideFile, userPrompt, selections = [] }) {
+export function buildCodexEditPrompt({ slideFile, slidePath, userPrompt, selections = [] }) {
   const sanitizedPrompt = typeof userPrompt === 'string' ? userPrompt.trim() : '';
   if (!sanitizedPrompt) {
     throw new Error('Prompt must be a non-empty string.');
   }
 
-  if (typeof slideFile !== 'string' || slideFile.trim() === '') {
-    throw new Error('Slide file is required.');
-  }
+  const normalizedSlidePath = typeof slidePath === 'string' && slidePath.trim() !== ''
+    ? slidePath.trim()
+    : (typeof slideFile === 'string' && slideFile.trim() !== '' ? `slides/${slideFile.trim()}` : '');
+  if (!normalizedSlidePath) throw new Error('Slide path is required.');
 
   if (!Array.isArray(selections) || selections.length === 0) {
     throw new Error('At least one selection is required.');
@@ -103,7 +104,7 @@ export function buildCodexEditPrompt({ slideFile, userPrompt, selections = [] })
   });
 
   return [
-    `Edit slides/${slideFile} only.`,
+    `Edit ${normalizedSlidePath} only.`,
     '',
     'User edit request:',
     sanitizedPrompt,

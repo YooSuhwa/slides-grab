@@ -270,10 +270,10 @@ async function createPresentation() {
     pptx.title = 'My Presentation';
 
     // Slide 1: Title
-    const { slide: slide1 } = await html2pptx('slides/title.html', pptx);
+    const { slide: slide1 } = await html2pptx('<slides-dir>/title.html', pptx);
 
     // Slide 2: Content with chart
-    const { slide: slide2, placeholders } = await html2pptx('slides/data.html', pptx);
+    const { slide: slide2, placeholders } = await html2pptx('<slides-dir>/data.html', pptx);
 
     const chartData = [{
         name: 'Sales',

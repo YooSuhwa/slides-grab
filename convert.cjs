@@ -8,6 +8,82 @@ const sharp = require('sharp');
 const PT_PER_PX = 0.75;
 const PX_PER_IN = 96;
 const EMU_PER_IN = 914400;
+const DEFAULT_SLIDES_DIR = 'slides';
+const DEFAULT_OUTPUT = 'AI-시대의-개인도구.pptx';
+
+function printUsage() {
+  process.stdout.write(
+    [
+      'Usage: node convert.cjs [options]',
+      '',
+      'Options:',
+      `  --slides-dir <path>  Slide directory (default: ${DEFAULT_SLIDES_DIR})`,
+      `  --output <path>      Output pptx path (default: ${DEFAULT_OUTPUT})`,
+      '  -h, --help           Show this help message',
+    ].join('\n'),
+  );
+  process.stdout.write('\n');
+}
+
+function readOptionValue(args, index, optionName) {
+  const next = args[index + 1];
+  if (!next || next.startsWith('-')) {
+    throw new Error(`Missing value for ${optionName}.`);
+  }
+  return next;
+}
+
+function parseArgs(args) {
+  const options = {
+    slidesDir: DEFAULT_SLIDES_DIR,
+    output: DEFAULT_OUTPUT,
+    help: false,
+  };
+
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (arg === '-h' || arg === '--help') {
+      options.help = true;
+      continue;
+    }
+
+    if (arg === '--slides-dir') {
+      options.slidesDir = readOptionValue(args, i, '--slides-dir');
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--slides-dir=')) {
+      options.slidesDir = arg.slice('--slides-dir='.length);
+      continue;
+    }
+
+    if (arg === '--output') {
+      options.output = readOptionValue(args, i, '--output');
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--output=')) {
+      options.output = arg.slice('--output='.length);
+      continue;
+    }
+
+    throw new Error(`Unknown option: ${arg}`);
+  }
+
+  if (typeof options.slidesDir !== 'string' || options.slidesDir.trim() === '') {
+    throw new Error('--slides-dir must be a non-empty string.');
+  }
+
+  if (typeof options.output !== 'string' || options.output.trim() === '') {
+    throw new Error('--output must be a non-empty string.');
+  }
+
+  options.slidesDir = options.slidesDir.trim();
+  options.output = options.output.trim();
+  return options;
+}
 
 async function convertSlide(htmlFile, pres, browser) {
   const filePath = path.isAbsolute(htmlFile) ? htmlFile : path.join(process.cwd(), htmlFile);
@@ -58,10 +134,16 @@ async function convertSlide(htmlFile, pres, browser) {
 }
 
 async function main() {
+  const options = parseArgs(process.argv.slice(2));
+  if (options.help) {
+    printUsage();
+    return;
+  }
+
   const pres = new PptxGenJS();
   pres.layout = 'LAYOUT_WIDE'; // 16:9
 
-  const slidesDir = path.join(__dirname, 'slides');
+  const slidesDir = path.resolve(process.cwd(), options.slidesDir);
   const files = fs.readdirSync(slidesDir)
     .filter(f => f.endsWith('.html'))
     .sort();
@@ -86,7 +168,7 @@ async function main() {
 
   await browser.close();
 
-  const outputFile = path.join(__dirname, 'AI-시대의-개인도구.pptx');
+  const outputFile = path.resolve(process.cwd(), options.output);
   await pres.writeFile({ fileName: outputFile });
   console.log(`\nSaved: ${outputFile}`);
 

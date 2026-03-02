@@ -3,27 +3,105 @@
 /**
  * build-viewer.js
  *
- * Builds a single viewer.html from slides/slide-*.html files.
+ * Builds a single viewer.html from slide-*.html files in selected --slides-dir.
  * Works with file:// protocol — all slides are inlined into one HTML.
  */
 
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
-const SLIDES_DIR = join(process.cwd(), 'slides');
+const DEFAULT_SLIDES_DIR = 'slides';
+
+function printUsage() {
+  process.stdout.write(
+    [
+      'Usage: node scripts/build-viewer.js [options]',
+      '',
+      'Options:',
+      `  --slides-dir <path>  Slide directory (default: ${DEFAULT_SLIDES_DIR})`,
+      '  -h, --help           Show this help message',
+    ].join('\n'),
+  );
+  process.stdout.write('\n');
+}
+
+function readOptionValue(args, index, optionName) {
+  const next = args[index + 1];
+  if (!next || next.startsWith('-')) {
+    throw new Error(`Missing value for ${optionName}.`);
+  }
+  return next;
+}
+
+function parseCliArgs(args) {
+  const options = {
+    slidesDir: DEFAULT_SLIDES_DIR,
+    help: false,
+  };
+
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+
+    if (arg === '-h' || arg === '--help') {
+      options.help = true;
+      continue;
+    }
+
+    if (arg === '--slides-dir') {
+      options.slidesDir = readOptionValue(args, i, '--slides-dir');
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--slides-dir=')) {
+      options.slidesDir = arg.slice('--slides-dir='.length);
+      continue;
+    }
+
+    throw new Error(`Unknown option: ${arg}`);
+  }
+
+  if (typeof options.slidesDir !== 'string' || options.slidesDir.trim() === '') {
+    throw new Error('--slides-dir must be a non-empty string.');
+  }
+
+  options.slidesDir = options.slidesDir.trim();
+  return options;
+}
+
+let cliOptions;
+try {
+  cliOptions = parseCliArgs(process.argv.slice(2));
+} catch (error) {
+  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+  process.exit(1);
+}
+if (cliOptions.help) {
+  printUsage();
+  process.exit(0);
+}
+
+const SLIDES_DIR = resolve(process.cwd(), cliOptions.slidesDir);
 const OUTPUT = join(SLIDES_DIR, 'viewer.html');
 
 // 슬라이드 파일 목록 (숫자순 정렬)
-const slideFiles = readdirSync(SLIDES_DIR)
-  .filter(f => /^slide-\d+\.html$/.test(f))
-  .sort((a, b) => {
-    const numA = parseInt(a.match(/\d+/)[0], 10);
-    const numB = parseInt(b.match(/\d+/)[0], 10);
-    return numA - numB;
-  });
+let slideFiles = [];
+try {
+  slideFiles = readdirSync(SLIDES_DIR)
+    .filter(f => /^slide-\d+\.html$/.test(f))
+    .sort((a, b) => {
+      const numA = parseInt(a.match(/\d+/)[0], 10);
+      const numB = parseInt(b.match(/\d+/)[0], 10);
+      return numA - numB;
+    });
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  process.stderr.write(`Failed to read slide directory: ${SLIDES_DIR}\n${message}\n`);
+  process.exit(1);
+}
 
 if (slideFiles.length === 0) {
-  console.error('No slide-*.html files found in slides/');
+  console.error(`No slide-*.html files found in: ${SLIDES_DIR}`);
   process.exit(1);
 }
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { readdir, readFile, mkdtemp, rm } from 'node:fs/promises';
+import { readdir, readFile, mkdtemp, rm, mkdir } from 'node:fs/promises';
 import { watch as fsWatch } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve, relative, sep } from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -33,6 +33,7 @@ async function loadDeps() {
 }
 
 const DEFAULT_PORT = 3456;
+const DEFAULT_SLIDES_DIR = 'slides';
 const CODEX_MODELS = ['gpt-5.3-codex', 'gpt-5.3-codex-spark'];
 const DEFAULT_CODEX_MODEL = CODEX_MODELS[0];
 const SLIDE_FILE_PATTERN = /^slide-.*\.html$/i;
@@ -44,6 +45,7 @@ function printUsage() {
   process.stdout.write(`Usage: ppt-agent edit [options]\n\n`);
   process.stdout.write(`Options:\n`);
   process.stdout.write(`  --port <number>           Server port (default: ${DEFAULT_PORT})\n`);
+  process.stdout.write(`  --slides-dir <path>       Slide directory (default: ${DEFAULT_SLIDES_DIR})\n`);
   process.stdout.write(`  Model is selected in editor UI dropdown.\n`);
   process.stdout.write(`  -h, --help                Show this help message\n`);
 }
@@ -51,6 +53,7 @@ function printUsage() {
 function parseArgs(argv) {
   const opts = {
     port: DEFAULT_PORT,
+    slidesDir: DEFAULT_SLIDES_DIR,
     help: false,
   };
 
@@ -67,6 +70,22 @@ function parseArgs(argv) {
       continue;
     }
 
+    if (arg.startsWith('--port=')) {
+      opts.port = Number(arg.slice('--port='.length));
+      continue;
+    }
+
+    if (arg === '--slides-dir') {
+      opts.slidesDir = argv[i + 1];
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--slides-dir=')) {
+      opts.slidesDir = arg.slice('--slides-dir='.length);
+      continue;
+    }
+
     if (arg === '--codex-model') {
       // Backward compatibility: ignore legacy CLI option.
       i += 1;
@@ -79,6 +98,12 @@ function parseArgs(argv) {
   if (!Number.isInteger(opts.port) || opts.port <= 0) {
     throw new Error('`--port` must be a positive integer.');
   }
+
+  if (typeof opts.slidesDir !== 'string' || opts.slidesDir.trim() === '') {
+    throw new Error('`--slides-dir` must be a non-empty path.');
+  }
+
+  opts.slidesDir = opts.slidesDir.trim();
 
   return opts;
 }
@@ -119,12 +144,19 @@ async function withScreenshotPage(callback) {
   }
 }
 
-function slidesDir() {
-  return join(process.cwd(), 'slides');
+function toPosixPath(inputPath) {
+  return inputPath.split(sep).join('/');
 }
 
-async function listSlideFiles() {
-  const entries = await readdir(slidesDir(), { withFileTypes: true });
+function toSlidePathLabel(slidesDirectory, slideFile) {
+  const relativePath = relative(process.cwd(), join(slidesDirectory, slideFile));
+  const hasParentTraversal = relativePath.startsWith('..');
+  const label = !hasParentTraversal && relativePath !== '' ? relativePath : join(slidesDirectory, slideFile);
+  return toPosixPath(label);
+}
+
+async function listSlideFiles(slidesDirectory) {
+  const entries = await readdir(slidesDirectory, { withFileTypes: true });
   return entries
     .filter((entry) => entry.isFile() && SLIDE_FILE_PATTERN.test(entry.name))
     .map((entry) => entry.name)
@@ -330,6 +362,8 @@ function createRunStore() {
 
 async function startServer(opts) {
   await loadDeps();
+  const slidesDirectory = resolve(process.cwd(), opts.slidesDir);
+  await mkdir(slidesDirectory, { recursive: true });
 
   const runStore = createRunStore();
 
@@ -360,7 +394,7 @@ async function startServer(opts) {
       return res.status(400).send('Invalid slide filename');
     }
 
-    const filePath = join(slidesDir(), file);
+    const filePath = join(slidesDirectory, file);
     try {
       const html = await readFile(filePath, 'utf-8');
       res.type('html').send(html);
@@ -371,7 +405,7 @@ async function startServer(opts) {
 
   app.get('/api/slides', async (_req, res) => {
     try {
-      const files = await listSlideFiles();
+      const files = await listSlideFiles(slidesDirectory);
       res.json(files);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -497,6 +531,7 @@ async function startServer(opts) {
 
       const codexPrompt = buildCodexEditPrompt({
         slideFile: slide,
+        slidePath: toSlidePathLabel(slidesDirectory, slide),
         userPrompt: prompt,
         selections: normalizedSelections,
       });
@@ -572,7 +607,7 @@ async function startServer(opts) {
   });
 
   let debounceTimer = null;
-  const watcher = fsWatch(slidesDir(), { persistent: false }, (_eventType, filename) => {
+  const watcher = fsWatch(slidesDirectory, { persistent: false }, (_eventType, filename) => {
     if (!filename || !SLIDE_FILE_PATTERN.test(filename)) return;
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -585,7 +620,7 @@ async function startServer(opts) {
     process.stdout.write('  ─────────────────────────────────────\n');
     process.stdout.write(`  Local:       http://localhost:${opts.port}\n`);
     process.stdout.write(`  Codex models:${CODEX_MODELS.join(', ')}\n`);
-    process.stdout.write(`  Slides:      ${slidesDir()}\n`);
+    process.stdout.write(`  Slides:      ${slidesDirectory}\n`);
     process.stdout.write('  ─────────────────────────────────────\n\n');
   });
 

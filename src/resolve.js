@@ -5,7 +5,7 @@
  *   1. Local (user's CWD) — per-project overrides
  *   2. Package root — built-in defaults
  *
- * slides/, slide-outline.md, style-config.md → always local (CWD)
+ * slides directory, slide-outline.md, style-config.md → always local (CWD)
  * templates/, themes/ → local first, package fallback
  * scripts/ → always package
  */
@@ -32,10 +32,11 @@ export function getCwd() {
 }
 
 /**
- * Resolve the slides directory. Always in CWD.
+ * Resolve the slides directory in CWD.
+ * @param {string} [slidesDir='slides'] - relative or absolute slides directory path
  */
-export function getSlidesDir() {
-  return join(getCwd(), 'slides');
+export function getSlidesDir(slidesDir = process.env.PPT_AGENT_SLIDES_DIR || 'slides') {
+  return resolve(getCwd(), slidesDir);
 }
 
 /**

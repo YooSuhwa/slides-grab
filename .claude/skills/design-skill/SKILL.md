@@ -501,7 +501,7 @@ Rules:
 
 ### File Save Rules
 ```
-slides/
+<slides-dir>/   (default: slides/)
 ├── slide-01.html  (Cover)
 ├── slide-02.html  (Contents)
 ├── slide-03.html  (Section Divider)
@@ -529,21 +529,21 @@ This skill is **Stage 2**. It works from the `slide-outline.md` approved by the 
 1. **Analyze + Design**: Read `slide-outline.md`, decide theme/layout, generate HTML slides
 2. **Auto-build viewer**: After slide generation, automatically run:
    ```bash
-   node scripts/build-viewer.js
+   node scripts/build-viewer.js --slides-dir <path>
    ```
 3. **Guide user to review**: Tell the user to check slides in the browser:
    ```
-   open slides/viewer.html
+   open <slides-dir>/viewer.html
    ```
 4. **Revision loop**: When the user requests changes to specific slides:
    - Edit only the relevant HTML file
-   - Re-run `node scripts/build-viewer.js` to rebuild the viewer
+   - Re-run `node scripts/build-viewer.js --slides-dir <path>` to rebuild the viewer
    - Guide user to review again
 5. **Completion**: Repeat the revision loop until the user signals approval for PPTX conversion
 
 ### Absolute Rules
 - **Never start PPTX conversion without approval** — PPTX conversion is the responsibility of `pptx-skill` and requires explicit user approval.
-- **Never forget to build the viewer** — Run `node scripts/build-viewer.js` every time slides are generated or modified.
+- **Never forget to build the viewer** — Run `node scripts/build-viewer.js --slides-dir <path>` every time slides are generated or modified.
 
 ---
 

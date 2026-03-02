@@ -33,3 +33,7 @@
 - Title: VLM 기반 사용자 스타일 추출
 - Attempts: 1
 
+## US-008 — PASS (2026-02-27T15:17:36Z)
+- Title: 프로젝트 패키징 기반 구조
+- Attempts: 1
+

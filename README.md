@@ -3,17 +3,20 @@
 Agent-first PPT framework.
 Agents write HTML slides directly, and a Planning -> Design -> Conversion pipeline produces PPTX/PDF output.
 
-## Setup (Copy/Paste)
+## Installation
 
-Setup commands from `SETUP.md` are included below for convenience.
+Use the quick install below, then follow the agent-specific guide:
 
-### 1) Clone the Repository
+- Claude guide: [docs/installation/claude.md](docs/installation/claude.md)
+- Codex guide: [docs/installation/codex.md](docs/installation/codex.md)
+
+### 1) Clone Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/ppt_team_agent.git && cd ppt_team_agent
 ```
 
-### 2) One-Liner Install by OS
+### 2) Install Dependencies
 
 macOS (Homebrew):
 
@@ -39,12 +42,37 @@ winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-so
 npm exec -- ppt-agent --help
 ```
 
+### 4) Agent Copy-Paste Prompts
+
+Prompt for Claude:
+
+```text
+Read docs/installation/claude.md first and follow it exactly. Use the 3-stage Claude skills workflow (.claude/skills/plan-skill, design-skill, pptx-skill). Use decks/<deck-name> as the slides workspace and run validate before conversion.
+```
+
+Prompt for Codex:
+
+```text
+Read docs/installation/codex.md first and follow it exactly. Use Codex skills (ppt-plan-skill, ppt-design-skill, ppt-pptx-skill), keep each deck in decks/<deck-name>, and run validate before convert/pdf.
+```
+
 ## CLI
 
 ```bash
 ppt-agent build-viewer
 ppt-agent validate
 ppt-agent convert
+```
+
+All slide commands support `--slides-dir <path>` (default: `slides`).
+Use it to manage multiple decks by folder name:
+
+```bash
+ppt-agent edit --slides-dir decks/ralph-b00
+ppt-agent build-viewer --slides-dir decks/ralph-b00
+ppt-agent validate --slides-dir decks/ralph-b00
+ppt-agent pdf --slides-dir decks/ralph-b00 --output decks/ralph-b00.pdf
+ppt-agent convert --slides-dir decks/ralph-b00 --output decks/ralph-b00.pptx
 ```
 
 For local development you can also run directly:
