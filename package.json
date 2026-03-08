@@ -1,16 +1,16 @@
 {
-  "name": "ppt-team-agent",
+  "name": "slides-grab",
   "version": "1.0.0",
   "description": "Agent-first presentation framework — plan, design, and visually edit HTML slides with Claude Code or Codex, then export to PPTX/PDF",
   "license": "MIT",
   "author": "vkehfdl1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vkehfdl1/ppt_team_agent.git"
+    "url": "git+https://github.com/vkehfdl1/slides-grab.git"
   },
-  "homepage": "https://github.com/vkehfdl1/ppt_team_agent#readme",
+  "homepage": "https://github.com/vkehfdl1/slides-grab#readme",
   "bugs": {
-    "url": "https://github.com/vkehfdl1/ppt_team_agent/issues"
+    "url": "https://github.com/vkehfdl1/slides-grab/issues"
   },
   "keywords": [
     "presentation",
@@ -28,7 +28,7 @@
   },
   "type": "module",
   "bin": {
-    "ppt-agent": "./bin/ppt-agent.js"
+    "slides-grab": "./bin/ppt-agent.js"
   },
   "scripts": {
     "html2pptx": "node .claude/skills/pptx-skill/scripts/html2pptx.js",

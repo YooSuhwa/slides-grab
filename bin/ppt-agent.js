@@ -44,7 +44,7 @@ async function runCommand(relativePath, args = []) {
       process.exitCode = code;
     }
   } catch (error) {
-    console.error(`[ppt-agent] ${error.message}`);
+    console.error(`[slides-grab] ${error.message}`);
     process.exitCode = 1;
   }
 }
@@ -52,7 +52,7 @@ async function runCommand(relativePath, args = []) {
 const program = new Command();
 
 program
-  .name('ppt-agent')
+  .name('slides-grab')
   .description('Agent-first PPT framework CLI')
   .version(packageJson.version);
 

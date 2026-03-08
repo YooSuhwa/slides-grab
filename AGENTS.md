@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-ppt-team-agent is an agent-first PPT framework. AI agents write HTML slides directly, and a 3-stage pipeline (Planning → Design → Conversion) produces high-quality PPTX/PDF output.
+slides-grab is an agent-first PPT framework. AI agents write HTML slides directly, and a 3-stage pipeline (Planning → Design → Conversion) produces high-quality PPTX/PDF output.
 
 **Core philosophy: HTML is the design language.** Agents write HTML/CSS directly. The framework provides templates, validation, and conversion tools — not abstractions over HTML.
 

@@ -1,4 +1,4 @@
-# ppt-team-agent
+# slides-grab
 
 Agent-first presentation framework for **Claude Code** and **Codex**.
 
@@ -6,7 +6,7 @@ AI agents plan your slide outline, generate production-ready HTML slides, and ex
 
 ## Why This Project?
 
-There are many AI tools that generate slide HTML. Almost none let you **visually point at what you want changed** and iterate in-place. ppt-team-agent fills that gap:
+There are many AI tools that generate slide HTML. Almost none let you **visually point at what you want changed** and iterate in-place. slides-grab fills that gap:
 
 - **Plan** — Agent creates a structured slide outline from your topic/files
 - **Design** — Agent generates each slide as a self-contained HTML file
@@ -17,15 +17,15 @@ There are many AI tools that generate slide HTML. Almost none let you **visually
 
 ```bash
 # 1. Clone & install
-git clone https://github.com/vkehfdl1/ppt_team_agent.git && cd ppt_team_agent
+git clone https://github.com/vkehfdl1/slides-grab.git && cd slides-grab
 npm ci && npx playwright install chromium
 
 # 2. Open the editor
-ppt-agent edit --slides-dir slides
+slides-grab edit --slides-dir slides
 
 # 3. Export
-ppt-agent convert --slides-dir slides --output deck.pptx
-ppt-agent pdf --slides-dir slides --output deck.pdf
+slides-grab convert --slides-dir slides --output deck.pptx
+slides-grab pdf --slides-dir slides --output deck.pdf
 ```
 
 > Requires **Node.js >= 18**. See platform-specific install instructions below.
@@ -64,7 +64,7 @@ npm ci; npx playwright install chromium
 ### Verify
 
 ```bash
-npm exec -- ppt-agent --help
+npm exec -- slides-grab --help
 ```
 
 ## CLI Commands
@@ -72,22 +72,22 @@ npm exec -- ppt-agent --help
 All commands support `--slides-dir <path>` (default: `slides`).
 
 ```bash
-ppt-agent edit              # Launch visual slide editor
-ppt-agent build-viewer      # Build single-file viewer.html
-ppt-agent validate          # Validate slide HTML (Playwright-based)
-ppt-agent convert           # Export to PPTX
-ppt-agent pdf               # Export to PDF
-ppt-agent list-templates    # Show available slide templates
-ppt-agent list-themes       # Show available color themes
+slides-grab edit              # Launch visual slide editor
+slides-grab build-viewer      # Build single-file viewer.html
+slides-grab validate          # Validate slide HTML (Playwright-based)
+slides-grab convert           # Export to PPTX
+slides-grab pdf               # Export to PDF
+slides-grab list-templates    # Show available slide templates
+slides-grab list-themes       # Show available color themes
 ```
 
 ### Multi-Deck Workflow
 
 ```bash
-ppt-agent edit       --slides-dir decks/my-deck
-ppt-agent validate   --slides-dir decks/my-deck
-ppt-agent pdf        --slides-dir decks/my-deck --output decks/my-deck.pdf
-ppt-agent convert    --slides-dir decks/my-deck --output decks/my-deck.pptx
+slides-grab edit       --slides-dir decks/my-deck
+slides-grab validate   --slides-dir decks/my-deck
+slides-grab pdf        --slides-dir decks/my-deck --output decks/my-deck.pdf
+slides-grab convert    --slides-dir decks/my-deck --output decks/my-deck.pptx
 ```
 
 ## Agent Kickoff Prompts
@@ -109,7 +109,7 @@ Read docs/installation/codex.md first and follow it exactly. Use Codex skills (p
 Install Codex-native skills (`skills/ppt-plan-skill`, `ppt-design-skill`, `ppt-pptx-skill`):
 
 ```bash
-ppt-agent install-codex-skills --force
+slides-grab install-codex-skills --force
 ```
 
 Restart Codex after installation.

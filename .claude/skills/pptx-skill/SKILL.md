@@ -40,7 +40,7 @@ If prerequisites are not met, guide the user to review slides in `<slides-dir>/v
 
 2. **Run html2pptx.js**
    ```bash
-   ppt-agent convert --slides-dir <path> --output presentation.pptx
+   slides-grab convert --slides-dir <path> --output presentation.pptx
    ```
    - Script-level alternative:
    ```bash

@@ -1,7 +1,7 @@
 # PRD
 
 ## Project
-- Name: ppt-team-agent
+- Name: slides-grab
 - Branch: main
 - Description: Agent-first PPT framework — AI 에이전트가 HTML 슬라이드를 직접 작성하고, 3단계 파이프라인(Planning→Design→Conversion)으로 고품질 PPTX/PDF를 생성하는 프레임워크. 이번 PRD는 프레임워크의 핵심 기능 확장(VLM 검증, 차트 지원, 스타일 추출)과 배포 기반(npm 패키지, Skills 표준)을 구축한다.
 
@@ -94,11 +94,11 @@
 ### US-008
 - Title: 프로젝트 패키징 기반 구조
 - Priority: 8
-- Description: ppt-team-agent를 npm 패키지로 배포하기 위한 기반 구조를 구축한다. SETUP.md 작성, README.md 업데이트, CLI 기본 뼈대, agentskills.io 표준 SKILL.md frontmatter 적용. npm publish 자체는 이번 범위에 포함하지 않는다.
+- Description: slides-grab를 npm 패키지로 배포하기 위한 기반 구조를 구축한다. SETUP.md 작성, README.md 업데이트, CLI 기본 뼈대, agentskills.io 표준 SKILL.md frontmatter 적용. npm publish 자체는 이번 범위에 포함하지 않는다.
 - Acceptance Criteria:
   - REQ-043 `SETUP.md`가 존재하고, macOS(brew), Ubuntu(apt), Windows(winget) 별 원라이너 설치 명령이 포함된다
   - REQ-044 `README.md`에 SETUP.md 내용이 포함되어 사용자가 복붙으로 설치할 수 있다
-  - REQ-045 `bin/ppt-agent.js`에 CLI 기본 뼈대가 존재한다 (commander 패키지 사용, `ppt-agent --help` 출력 가능)
+  - REQ-045 `bin/slides-grab.js`에 CLI 기본 뼈대가 존재한다 (commander 패키지 사용, `slides-grab --help` 출력 가능)
   - REQ-046 CLI에 `build-viewer`, `validate`, `convert` 서브커맨드가 정의된다 (각 스크립트를 호출하는 래퍼)
-  - REQ-047 package.json에 `"bin": { "ppt-agent": "./bin/ppt-agent.js" }`가 설정된다
+  - REQ-047 package.json에 `"bin": { "slides-grab": "./bin/slides-grab.js" }`가 설정된다
   - REQ-048 모든 SKILL.md 파일에 agentskills.io 표준 frontmatter(name, description)가 포함된다

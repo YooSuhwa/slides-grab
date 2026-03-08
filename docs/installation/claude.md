@@ -1,13 +1,13 @@
 # Claude Setup And Usage
 
-This guide is for running `ppt-team-agent` with Claude-based workflow files under `.claude/skills/`.
+This guide is for running `slides-grab` with Claude-based workflow files under `.claude/skills/`.
 
 ## 1) Install Dependencies
 
 Clone:
 
 ```bash
-git clone https://github.com/vkehfdl1/ppt_team_agent.git && cd ppt_team_agent
+git clone https://github.com/vkehfdl1/slides-grab.git && cd slides-grab
 ```
 
 Install (macOS):
@@ -31,7 +31,7 @@ winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-so
 Verify:
 
 ```bash
-npm exec -- ppt-agent --help
+npm exec -- slides-grab --help
 ```
 
 ## 2) Claude Skill Workflow
@@ -53,11 +53,11 @@ Core references:
 Use one workspace folder per deck:
 
 ```bash
-ppt-agent edit --slides-dir decks/my-deck
-ppt-agent build-viewer --slides-dir decks/my-deck
-ppt-agent validate --slides-dir decks/my-deck
-ppt-agent pdf --slides-dir decks/my-deck --output decks/my-deck.pdf
-ppt-agent convert --slides-dir decks/my-deck --output decks/my-deck.pptx
+slides-grab edit --slides-dir decks/my-deck
+slides-grab build-viewer --slides-dir decks/my-deck
+slides-grab validate --slides-dir decks/my-deck
+slides-grab pdf --slides-dir decks/my-deck --output decks/my-deck.pdf
+slides-grab convert --slides-dir decks/my-deck --output decks/my-deck.pptx
 ```
 
 ## 4) Recommended Claude Kickoff Prompt

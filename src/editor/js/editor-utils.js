@@ -78,7 +78,7 @@ export function isBoldFontWeight(value) {
 
 export function loadSavedModel() {
   try {
-    return normalizeModelName(window.localStorage.getItem('ppt-agent-editor-model'));
+    return normalizeModelName(window.localStorage.getItem('slides-grab-editor-model'));
   } catch {
     return '';
   }
@@ -86,7 +86,7 @@ export function loadSavedModel() {
 
 export function saveSelectedModel(model) {
   try {
-    window.localStorage.setItem('ppt-agent-editor-model', model);
+    window.localStorage.setItem('slides-grab-editor-model', model);
   } catch {
     // ignore
   }

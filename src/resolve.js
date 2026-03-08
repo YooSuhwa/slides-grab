@@ -1,5 +1,5 @@
 /**
- * Path resolution for ppt-team-agent.
+ * Path resolution for slides-grab.
  *
  * Resolution order:
  *   1. Local (user's CWD) — per-project overrides
@@ -18,7 +18,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ROOT = resolve(__dirname, '..');
 
 /**
- * Get the package root directory (where ppt-team-agent is installed).
+ * Get the package root directory (where slides-grab is installed).
  */
 export function getPackageRoot() {
   return PACKAGE_ROOT;

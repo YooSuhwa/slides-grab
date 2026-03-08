@@ -23,9 +23,9 @@ Convert reviewed slide HTML into PPTX (and optional PDF) reliably.
 1. Confirm user approval for conversion.
 2. Run conversion command:
    - `node .claude/skills/pptx-skill/scripts/html2pptx.js`
-   - or `ppt-agent convert --slides-dir <path>`
+   - or `slides-grab convert --slides-dir <path>`
 3. If requested, run PDF conversion:
-   - `ppt-agent pdf --slides-dir <path>`
+   - `slides-grab pdf --slides-dir <path>`
 4. Report success/failure with actionable errors.
 
 ## Rules

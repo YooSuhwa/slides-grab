@@ -1,11 +1,11 @@
 # Setup
 
-Copy-paste installation guide for `ppt-team-agent`.
+Copy-paste installation guide for `slides-grab`.
 
 ## 1) Clone the Repository
 
 ```bash
-git clone https://github.com/vkehfdl1/ppt_team_agent.git && cd ppt_team_agent
+git clone https://github.com/vkehfdl1/slides-grab.git && cd slides-grab
 ```
 
 ## 2) One-Liner Install by OS
@@ -31,5 +31,5 @@ winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-so
 ## 3) Verify CLI
 
 ```bash
-npm exec -- ppt-agent --help
+npm exec -- slides-grab --help
 ```

@@ -46,7 +46,7 @@ const MAX_RUNS = 200;
 const MAX_LOG_CHARS = 800_000;
 
 function printUsage() {
-  process.stdout.write(`Usage: ppt-agent edit [options]\n\n`);
+  process.stdout.write(`Usage: slides-grab edit [options]\n\n`);
   process.stdout.write(`Options:\n`);
   process.stdout.write(`  --port <number>           Server port (default: ${DEFAULT_PORT})\n`);
   process.stdout.write(`  --slides-dir <path>       Slide directory (default: ${DEFAULT_SLIDES_DIR})\n`);
@@ -734,7 +734,7 @@ async function startServer(opts) {
   });
 
   const server = app.listen(opts.port, () => {
-    process.stdout.write('\n  ppt-agent editor\n');
+    process.stdout.write('\n  slides-grab editor\n');
     process.stdout.write('  ─────────────────────────────────────\n');
     process.stdout.write(`  Local:       http://localhost:${opts.port}\n`);
     process.stdout.write(`  Models:      ${ALL_MODELS.join(', ')}\n`);

@@ -1,13 +1,13 @@
 # Codex Setup And Usage
 
-This guide is for running `ppt-team-agent` with Codex and repo-local Codex skills.
+This guide is for running `slides-grab` with Codex and repo-local Codex skills.
 
 ## 1) Install Dependencies
 
 Clone:
 
 ```bash
-git clone https://github.com/vkehfdl1/ppt_team_agent.git && cd ppt_team_agent
+git clone https://github.com/vkehfdl1/slides-grab.git && cd slides-grab
 ```
 
 Install (macOS):
@@ -31,7 +31,7 @@ winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-so
 Verify:
 
 ```bash
-npm exec -- ppt-agent --help
+npm exec -- slides-grab --help
 ```
 
 ## 2) Install Codex Skills
@@ -39,7 +39,7 @@ npm exec -- ppt-agent --help
 Install project skills into `~/.codex/skills`:
 
 ```bash
-ppt-agent install-codex-skills --force
+slides-grab install-codex-skills --force
 ```
 
 Alternative:
@@ -61,11 +61,11 @@ Codex skill references:
 Run one deck per workspace folder:
 
 ```bash
-ppt-agent edit --slides-dir decks/my-deck
-ppt-agent build-viewer --slides-dir decks/my-deck
-ppt-agent validate --slides-dir decks/my-deck
-ppt-agent pdf --slides-dir decks/my-deck --output decks/my-deck.pdf
-ppt-agent convert --slides-dir decks/my-deck --output decks/my-deck.pptx
+slides-grab edit --slides-dir decks/my-deck
+slides-grab build-viewer --slides-dir decks/my-deck
+slides-grab validate --slides-dir decks/my-deck
+slides-grab pdf --slides-dir decks/my-deck --output decks/my-deck.pdf
+slides-grab convert --slides-dir decks/my-deck --output decks/my-deck.pptx
 ```
 
 ## 4) Recommended Codex Kickoff Prompt
