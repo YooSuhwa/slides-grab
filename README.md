@@ -1,114 +1,118 @@
-# ppt-team-agent
+<h1 align="center">slides-grab</h1>
 
-Agent-first PPT framework.
-Agents write HTML slides directly, and a Planning -> Design -> Conversion pipeline produces PPTX/PDF output.
+<p align="center">Select context for agents directly from AI-generated HTML slides</p>
 
-## Installation
+<p align="center">
+How? Just drag an area in the slides and ask the agent to edit it.<br>
+Simple things like text, size, or bold can still be edited manually, just like in the 2024 era.
+</p>
 
-Use the quick install below, then follow the agent-specific guide:
+<p align="center">
+The whole slides are HTML & CSS, the programming langauge (which is not) that outperformed by AI agents.<br>
+So the slides are beautiful, easily editable by AI agents, and can be converted to pdf and pptx.
+</p>
 
-- Claude guide: [docs/installation/claude.md](docs/installation/claude.md)
-- Codex guide: [docs/installation/codex.md](docs/installation/codex.md)
+<p align="center">
+The editor is pure javascript file. You can easily add up new features like adding new coding agents, changing designs, etc.
+</p>
 
-### 1) Clone Repository
+<p align="center">
+  <video src="https://github.com/vkehfdl1/slides-grab/raw/main/docs/assets/demo.mp4" width="720" autoplay loop muted playsinline></video>
+</p>
+
+---
+
+## Quick Start
+
+Paste one of these into your coding agent:
+
+**Claude Code:**
+
+```
+Read https://raw.githubusercontent.com/vkehfdl1/slides-grab/main/docs/prompts/setup-claude.md and follow every step.
+```
+
+**Codex:**
+
+```
+Read https://raw.githubusercontent.com/vkehfdl1/slides-grab/main/docs/prompts/setup-codex.md and follow every step.
+```
+
+Or clone manually:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ppt_team_agent.git && cd ppt_team_agent
+git clone https://github.com/vkehfdl1/slides-grab.git && cd slides-grab
+npm ci && npx playwright install chromium
 ```
 
-### 2) Install Dependencies
+> Requires **Node.js >= 18**.
 
-macOS (Homebrew):
+## Why This Project?
+
+There are many AI tools that generate slide HTML. Almost none let you **visually point at what you want changed** and iterate in-place. slides-grab fills that gap:
+
+- **Plan** — Agent creates a structured slide outline from your topic/files
+- **Design** — Agent generates each slide as a self-contained HTML file
+- **Edit** — Browser-based editor with bbox selection, direct text editing, and agent-powered rewrites
+- **Export** — One command to PPTX or PDF
+
+## CLI Commands
+
+All commands support `--slides-dir <path>` (default: `slides`).
 
 ```bash
-brew update && brew install node git && npm ci && npx playwright install chromium
+slides-grab edit              # Launch visual slide editor
+slides-grab build-viewer      # Build single-file viewer.html
+slides-grab validate          # Validate slide HTML (Playwright-based)
+slides-grab convert           # Export to PPTX
+slides-grab pdf               # Export to PDF
+slides-grab list-templates    # Show available slide templates
+slides-grab list-themes       # Show available color themes
 ```
 
-Ubuntu (apt):
+### Multi-Deck Workflow
 
 ```bash
-sudo apt-get update && sudo apt-get install -y curl git && curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs && npm ci && npx playwright install chromium
+slides-grab edit       --slides-dir decks/my-deck
+slides-grab validate   --slides-dir decks/my-deck
+slides-grab pdf        --slides-dir decks/my-deck --output decks/my-deck.pdf
+slides-grab convert    --slides-dir decks/my-deck --output decks/my-deck.pptx
 ```
 
-Windows (winget, PowerShell):
+## Installation Guides
 
-```powershell
-winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements; winget install -e --id Git.Git --accept-package-agreements --accept-source-agreements; npm ci; npx playwright install chromium
-```
+- [Claude Code setup](docs/prompts/setup-claude.md)
+- [Codex setup](docs/prompts/setup-codex.md)
+- [Claude detailed guide](docs/installation/claude.md)
+- [Codex detailed guide](docs/installation/codex.md)
 
-### 3) Verify CLI
+## npm Package
+
+Also available as an npm package for standalone CLI usage:
 
 ```bash
-npm exec -- ppt-agent --help
+npm install slides-grab
 ```
 
-### 4) Agent Copy-Paste Prompts
+## Project Structure
 
-Prompt for Claude:
-
-```text
-Read docs/installation/claude.md first and follow it exactly. Use the 3-stage Claude skills workflow (.claude/skills/plan-skill, design-skill, pptx-skill). Use decks/<deck-name> as the slides workspace and run validate before conversion.
+```
+bin/              CLI entry point
+src/editor/       Visual editor (HTML + JS client modules)
+scripts/          Build, validate, convert, editor server
+templates/        Slide HTML templates (cover, content, chart, ...)
+themes/           Color themes (modern-dark, executive, sage, ...)
+.claude/skills/   Claude Code skill definitions
+skills/           Codex skill definitions
+docs/             Installation & usage guides
 ```
 
-Prompt for Codex:
+## License
 
-```text
-Read docs/installation/codex.md first and follow it exactly. Use Codex skills (ppt-plan-skill, ppt-design-skill, ppt-pptx-skill), keep each deck in decks/<deck-name>, and run validate before convert/pdf.
-```
+[MIT](LICENSE)
 
-## CLI
 
-```bash
-ppt-agent build-viewer
-ppt-agent validate
-ppt-agent convert
-```
+## Acknowledgment
 
-All slide commands support `--slides-dir <path>` (default: `slides`).
-Use it to manage multiple decks by folder name:
+This project is built based on the [ppt_team_agent](https://github.com/uxjoseph/ppt_team_agent) by Builder Josh. Huge thanks to him!
 
-```bash
-ppt-agent edit --slides-dir decks/ralph-b00
-ppt-agent build-viewer --slides-dir decks/ralph-b00
-ppt-agent validate --slides-dir decks/ralph-b00
-ppt-agent pdf --slides-dir decks/ralph-b00 --output decks/ralph-b00.pdf
-ppt-agent convert --slides-dir decks/ralph-b00 --output decks/ralph-b00.pptx
-```
-
-For local development you can also run directly:
-
-```bash
-node bin/ppt-agent.js --help
-```
-
-## npm Scripts
-
-```bash
-npm run build-viewer
-npm run validate
-npm run convert
-npm run html2pptx
-npm run codex:install-skills
-```
-
-## Codex Skills
-
-This repository includes Codex-native skills under `skills/`:
-
-- `ppt-plan-skill`
-- `ppt-design-skill`
-- `ppt-pptx-skill`
-
-Install them into Codex skill home:
-
-```bash
-ppt-agent install-codex-skills --force
-```
-
-or:
-
-```bash
-node scripts/install-codex-skills.js --force
-```
-
-After installation, restart Codex to pick up the new skills.

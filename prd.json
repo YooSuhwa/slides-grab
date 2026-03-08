@@ -1,7 +1,7 @@
 {
-  "project": "ppt-team-agent",
+  "project": "slides-grab",
   "branchName": "main",
-  "description": "ppt-team-agent\ub97c npm \ud328\ud0a4\uc9c0\ub85c \ubc30\ud3ec\ud558\uae30 \uc704\ud55c \uae30\ubc18 \uad6c\uc870\ub97c \uad6c\ucd95\ud55c\ub2e4. SETUP.md \uc791\uc131, README.md \uc5c5\ub370\uc774\ud2b8, CLI \uae30\ubcf8 \ubf08\ub300, agentskills.io \ud45c\uc900 SKILL.md frontmatter \uc801\uc6a9. npm publish \uc790\uccb4\ub294 \uc774\ubc88 \ubc94\uc704\uc5d0 \ud3ec\ud568\ud558\uc9c0 \uc54a\ub294\ub2e4.",
+  "description": "slides-grab\ub97c npm \ud328\ud0a4\uc9c0\ub85c \ubc30\ud3ec\ud558\uae30 \uc704\ud55c \uae30\ubc18 \uad6c\uc870\ub97c \uad6c\ucd95\ud55c\ub2e4. SETUP.md \uc791\uc131, README.md \uc5c5\ub370\uc774\ud2b8, CLI \uae30\ubcf8 \ubf08\ub300, agentskills.io \ud45c\uc900 SKILL.md frontmatter \uc801\uc6a9. npm publish \uc790\uccb4\ub294 \uc774\ubc88 \ubc94\uc704\uc5d0 \ud3ec\ud568\ud558\uc9c0 \uc54a\ub294\ub2e4.",
   "userStories": [
     {
       "id": "US-001",
@@ -118,13 +118,13 @@
     {
       "id": "US-008",
       "title": "\ud504\ub85c\uc81d\ud2b8 \ud328\ud0a4\uc9d5 \uae30\ubc18 \uad6c\uc870",
-      "description": "ppt-team-agent\ub97c npm \ud328\ud0a4\uc9c0\ub85c \ubc30\ud3ec\ud558\uae30 \uc704\ud55c \uae30\ubc18 \uad6c\uc870\ub97c \uad6c\ucd95\ud55c\ub2e4. SETUP.md \uc791\uc131, README.md \uc5c5\ub370\uc774\ud2b8, CLI \uae30\ubcf8 \ubf08\ub300, agentskills.io \ud45c\uc900 SKILL.md frontmatter \uc801\uc6a9. npm publish \uc790\uccb4\ub294 \uc774\ubc88 \ubc94\uc704\uc5d0 \ud3ec\ud568\ud558\uc9c0 \uc54a\ub294\ub2e4.",
+      "description": "slides-grab\ub97c npm \ud328\ud0a4\uc9c0\ub85c \ubc30\ud3ec\ud558\uae30 \uc704\ud55c \uae30\ubc18 \uad6c\uc870\ub97c \uad6c\ucd95\ud55c\ub2e4. SETUP.md \uc791\uc131, README.md \uc5c5\ub370\uc774\ud2b8, CLI \uae30\ubcf8 \ubf08\ub300, agentskills.io \ud45c\uc900 SKILL.md frontmatter \uc801\uc6a9. npm publish \uc790\uccb4\ub294 \uc774\ubc88 \ubc94\uc704\uc5d0 \ud3ec\ud568\ud558\uc9c0 \uc54a\ub294\ub2e4.",
       "acceptanceCriteria": [
         "REQ-043 `SETUP.md`\uac00 \uc874\uc7ac\ud558\uace0, macOS(brew), Ubuntu(apt), Windows(winget) \ubcc4 \uc6d0\ub77c\uc774\ub108 \uc124\uce58 \uba85\ub839\uc774 \ud3ec\ud568\ub41c\ub2e4",
         "REQ-044 `README.md`\uc5d0 SETUP.md \ub0b4\uc6a9\uc774 \ud3ec\ud568\ub418\uc5b4 \uc0ac\uc6a9\uc790\uac00 \ubcf5\ubd99\uc73c\ub85c \uc124\uce58\ud560 \uc218 \uc788\ub2e4",
-        "REQ-045 `bin/ppt-agent.js`\uc5d0 CLI \uae30\ubcf8 \ubf08\ub300\uac00 \uc874\uc7ac\ud55c\ub2e4 (commander \ud328\ud0a4\uc9c0 \uc0ac\uc6a9, `ppt-agent --help` \ucd9c\ub825 \uac00\ub2a5)",
+        "REQ-045 `bin/slides-grab.js`\uc5d0 CLI \uae30\ubcf8 \ubf08\ub300\uac00 \uc874\uc7ac\ud55c\ub2e4 (commander \ud328\ud0a4\uc9c0 \uc0ac\uc6a9, `slides-grab --help` \ucd9c\ub825 \uac00\ub2a5)",
         "REQ-046 CLI\uc5d0 `build-viewer`, `validate`, `convert` \uc11c\ube0c\ucee4\ub9e8\ub4dc\uac00 \uc815\uc758\ub41c\ub2e4 (\uac01 \uc2a4\ud06c\ub9bd\ud2b8\ub97c \ud638\ucd9c\ud558\ub294 \ub798\ud37c)",
-        "REQ-047 package.json\uc5d0 `\"bin\": { \"ppt-agent\": \"./bin/ppt-agent.js\" }`\uac00 \uc124\uc815\ub41c\ub2e4",
+        "REQ-047 package.json\uc5d0 `\"bin\": { \"slides-grab\": \"./bin/slides-grab.js\" }`\uac00 \uc124\uc815\ub41c\ub2e4",
         "REQ-048 \ubaa8\ub4e0 SKILL.md \ud30c\uc77c\uc5d0 agentskills.io \ud45c\uc900 frontmatter(name, description)\uac00 \ud3ec\ud568\ub41c\ub2e4"
       ],
       "priority": 8,
