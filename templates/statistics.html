@@ -1,55 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      width: 720pt;
-      height: 405pt;
-      font-family: 'Pretendard', sans-serif;
-      background: #f5f5f0;
-      padding: 40pt 48pt;
-      display: flex;
-      flex-direction: column;
-    }
-  </style>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 720pt;
+    height: 405pt;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background: #ffffff;
+    padding: 48pt 64pt;
+    display: flex;
+    flex-direction: column;
+  }
+  h2 {
+    font-size: 22pt;
+    font-weight: 800;
+    color: #000;
+    letter-spacing: -0.5pt;
+    margin-bottom: 12pt;
+  }
+  .description {
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #6b6b6b;
+    margin-bottom: 32pt;
+  }
+  .metrics {
+    display: flex;
+    gap: 40pt;
+    flex: 1;
+  }
+  .metric .number {
+    font-size: 36pt;
+    font-weight: 800;
+    color: #000;
+    letter-spacing: -1pt;
+    line-height: 1;
+    margin-bottom: 8pt;
+  }
+  .metric h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 4pt;
+  }
+  .metric p {
+    font-size: 10pt;
+    color: #6b6b6b;
+  }
+</style>
 </head>
 <body>
-  <!-- 헤더 -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32pt;">
-    <h2 style="font-size: 28pt; font-weight: 600; color: #1a1a1a;">Key Metrics</h2>
-    <p style="font-size: 10pt; color: #999;">03</p>
-  </div>
-
-  <!-- 통계 카드 그리드 -->
-  <div style="flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24pt;">
-    <div style="background: #1a1a1a; border-radius: 12pt; padding: 28pt; display: flex; flex-direction: column; justify-content: space-between;">
-      <p style="font-size: 10pt; color: #888; text-transform: uppercase; letter-spacing: 0.05em;">Revenue Growth</p>
-      <div>
-        <p style="font-size: 48pt; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">85%</p>
-        <p style="font-size: 11pt; color: #666; margin-top: 8pt;">Year over year</p>
-      </div>
+  <h2>Metrics</h2>
+  <p class="description">Description about the data beside.</p>
+  <div class="metrics">
+    <div class="metric">
+      <div class="number">61%</div>
+      <h3>Metric 1</h3>
     </div>
-    <div style="background: #ffffff; border-radius: 12pt; padding: 28pt; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e5e5e0;">
-      <p style="font-size: 10pt; color: #888; text-transform: uppercase; letter-spacing: 0.05em;">Active Users</p>
-      <div>
-        <p style="font-size: 48pt; font-weight: 600; color: #1a1a1a; letter-spacing: -0.02em;">2.4M</p>
-        <p style="font-size: 11pt; color: #888; margin-top: 8pt;">+340K this quarter</p>
-      </div>
+    <div class="metric">
+      <div class="number">56%</div>
+      <h3>Metric 2</h3>
     </div>
-    <div style="background: #ffffff; border-radius: 12pt; padding: 28pt; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e5e5e0;">
-      <p style="font-size: 10pt; color: #888; text-transform: uppercase; letter-spacing: 0.05em;">Customer Satisfaction</p>
-      <div>
-        <p style="font-size: 48pt; font-weight: 600; color: #1a1a1a; letter-spacing: -0.02em;">4.9</p>
-        <p style="font-size: 11pt; color: #888; margin-top: 8pt;">Out of 5.0 rating</p>
-      </div>
+    <div class="metric">
+      <div class="number">55%</div>
+      <h3>Metric 3</h3>
     </div>
-  </div>
-
-  <!-- 푸터 -->
-  <div style="display: flex; justify-content: flex-end; padding-top: 16pt;">
-    <p style="font-size: 9pt; color: #999;">Source: Internal Analytics 2025</p>
+    <div class="metric">
+      <div class="number">48%</div>
+      <h3>Metric 4</h3>
+    </div>
   </div>
 </body>
 </html>
