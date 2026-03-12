@@ -67,10 +67,13 @@ slides-grab edit              # Launch visual slide editor
 slides-grab build-viewer      # Build single-file viewer.html
 slides-grab validate          # Validate slide HTML (Playwright-based)
 slides-grab convert           # Export to PPTX
-slides-grab pdf               # Export to PDF
+slides-grab pdf               # Export PDF in capture mode (default)
+slides-grab pdf --mode print  # Export searchable/selectable text PDF
 slides-grab list-templates    # Show available slide templates
 slides-grab list-themes       # Show available color themes
 ```
+
+`slides-grab pdf` now defaults to `--mode capture`, which rasterizes each rendered slide into the PDF for better visual fidelity. Use `--mode print` when searchable/selectable browser text matters more than pixel-perfect parity.
 
 ### Multi-Deck Workflow
 
@@ -78,6 +81,7 @@ slides-grab list-themes       # Show available color themes
 slides-grab edit       --slides-dir decks/my-deck
 slides-grab validate   --slides-dir decks/my-deck
 slides-grab pdf        --slides-dir decks/my-deck --output decks/my-deck.pdf
+slides-grab pdf        --slides-dir decks/my-deck --mode print --output decks/my-deck-searchable.pdf
 slides-grab convert    --slides-dir decks/my-deck --output decks/my-deck.pptx
 ```
 
@@ -117,4 +121,3 @@ docs/             Installation & usage guides
 ## Acknowledgment
 
 This project is built based on the [ppt_team_agent](https://github.com/uxjoseph/ppt_team_agent) by Builder Josh. Huge thanks to him!
-

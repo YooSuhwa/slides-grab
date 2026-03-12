@@ -36,9 +36,12 @@ slides-grab edit --slides-dir <path>         # Visual editor
 slides-grab build-viewer --slides-dir <path> # Build viewer.html
 slides-grab validate --slides-dir <path>     # Validate slides
 slides-grab convert --slides-dir <path>      # Export PPTX
-slides-grab pdf --slides-dir <path>          # Export PDF
+slides-grab pdf --slides-dir <path>          # Export PDF in capture mode (default)
+slides-grab pdf --slides-dir <path> --mode print
 ```
 
 Use `decks/<deck-name>/` as the slides workspace. Default is `slides/`.
+
+`--mode capture` is the default for browser-faithful output. `--mode print` keeps searchable/selectable PDF text.
 
 Setup complete. Ready to create presentations.
