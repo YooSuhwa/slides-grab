@@ -103,6 +103,27 @@ program
   });
 
 program
+  .command('svg')
+  .description('Export slide HTML files as individual SVG or PNG images')
+  .option('--slides-dir <path>', 'Slide directory', 'slides')
+  .option('--output <path>', 'Output directory', 'output')
+  .option('--format <type>', 'Output format: svg or png', 'svg')
+  .option('--scale <number>', 'Scale factor for output size', '2')
+  .action(async (options = {}) => {
+    const args = ['--slides-dir', options.slidesDir];
+    if (options.output) {
+      args.push('--output', String(options.output));
+    }
+    if (options.format) {
+      args.push('--format', String(options.format));
+    }
+    if (options.scale) {
+      args.push('--scale', String(options.scale));
+    }
+    await runCommand('scripts/html2svg.js', args);
+  });
+
+program
   .command('edit')
   .description('Start interactive slide editor with Codex image-based edit flow')
   .option('--port <number>', 'Server port')
@@ -113,6 +134,26 @@ program
       args.push('--port', String(options.port));
     }
     await runCommand('scripts/editor-server.js', args);
+  });
+
+program
+  .command('split')
+  .description('Split a multi-slide HTML file into individual slide-*.html files')
+  .requiredOption('--input <path>', 'Source HTML file containing multiple slides')
+  .option('--slides-dir <path>', 'Output directory', 'slides')
+  .option('--selector <sel>', 'CSS selector for slide elements', '.slide')
+  .option('--source-width <px>', 'Source slide width in px (auto-detected)')
+  .option('--source-height <px>', 'Source slide height in px (auto-detected)')
+  .option('--no-scale', 'Skip scaling (source is already 720pt×405pt)')
+  .action(async (options = {}) => {
+    const args = ['--input', options.input, '--slides-dir', options.slidesDir];
+    if (options.selector && options.selector !== '.slide') {
+      args.push('--selector', options.selector);
+    }
+    if (options.sourceWidth) args.push('--source-width', String(options.sourceWidth));
+    if (options.sourceHeight) args.push('--source-height', String(options.sourceHeight));
+    if (options.noScale === false) args.push('--no-scale');
+    await runCommand('scripts/split-html.js', args);
   });
 
 program

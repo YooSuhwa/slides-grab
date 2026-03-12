@@ -36,16 +36,21 @@
     "validate": "node scripts/validate-slides.js",
     "convert": "node convert.cjs",
     "codex:install-skills": "node scripts/install-codex-skills.js --force",
-    "test": "node --test tests/editor/editor-codex-edit.test.js tests/pdf/html2pdf.test.js",
+    "test": "node --test tests/editor/editor-codex-edit.test.js tests/pdf/html2pdf.test.js tests/svg/html2svg.test.js",
     "test:e2e": "node --test tests/editor/editor-ui.e2e.test.js tests/editor/editor-concurrency.e2e.test.js"
   },
   "dependencies": {
+    "archiver": "^7.0.1",
     "commander": "^12.1.0",
+    "dom-to-svg": "^0.12.2",
+    "esbuild": "^0.27.3",
     "express": "^5.2.1",
+    "opentype.js": "^1.3.4",
     "pdf-lib": "^1.17.1",
     "playwright": "^1.40.0",
     "pptxgenjs": "^3.12.0",
     "react-icons": "^5.0.0",
-    "sharp": "^0.33.0"
+    "sharp": "^0.33.0",
+    "ws": "^8.19.0"
   }
 }
