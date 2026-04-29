@@ -6990,6 +6990,376 @@
         border-radius: 3px; color: var(--ink-2);
       }
       .cmd-foot .sp { flex: 1; }
+
+      /* ══════════════════════════════════════════════════════════════
+         Review Modal v2 — hero + breakdown + issue cards + strengths
+         (uses tokens.css; light/dark via [data-theme])
+         ══════════════════════════════════════════════════════════════ */
+      /* state machine: loading | error | ready (default) */
+      .review-modal-v2[data-state="loading"] > .rv-error,
+      .review-modal-v2[data-state="loading"] > .rv-hero,
+      .review-modal-v2[data-state="loading"] > .rv-breakdown,
+      .review-modal-v2[data-state="loading"] > .rv-body,
+      .review-modal-v2[data-state="loading"] > .rv-foot { display: none; }
+      .review-modal-v2[data-state="error"] > .rv-loading,
+      .review-modal-v2[data-state="error"] > .rv-hero,
+      .review-modal-v2[data-state="error"] > .rv-breakdown,
+      .review-modal-v2[data-state="error"] > .rv-body { display: none; }
+      .review-modal-v2[data-state="ready"] > .rv-loading,
+      .review-modal-v2[data-state="ready"] > .rv-error { display: none; }
+      .review-modal-v2[data-state="loading"] { grid-template-rows: 1fr; }
+      .review-modal-v2[data-state="error"] { grid-template-rows: 1fr auto; }
+
+      .review-modal-v2 {
+        --rv-good-soft: #dcefe2;
+        --rv-warn-soft: #faedd7;
+        --rv-danger-soft: #fbe1de;
+        --rv-info: #3b82f6;
+        --rv-info-soft: rgba(59,130,246,0.10);
+        --rv-shadow: 0 4px 12px rgba(15,17,22,0.10), 0 32px 80px -20px rgba(15,17,22,0.45);
+        width: min(820px, 100%);
+        max-height: calc(100vh - 64px);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: var(--rv-shadow);
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        overflow: hidden;
+        position: relative;
+        animation: notesModalScale 220ms cubic-bezier(.2,.7,.2,1);
+      }
+      [data-theme="dark"] .review-modal-v2 {
+        --rv-good-soft: rgba(194,255,76,0.10);
+        --rv-warn-soft: rgba(241,177,67,0.10);
+        --rv-danger-soft: rgba(255,90,74,0.10);
+        --rv-info: #60a5fa;
+        --rv-info-soft: rgba(96,165,250,0.14);
+        --rv-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 36px 90px -20px rgba(0,0,0,0.7);
+      }
+      .review-modal-v2 .rv-close {
+        position: absolute; top: 14px; right: 14px;
+        width: 30px; height: 30px; border-radius: 8px;
+        color: var(--muted); display: grid; place-items: center;
+        transition: all .12s; z-index: 5;
+      }
+      .review-modal-v2 .rv-close:hover { background: var(--panel-2); color: var(--ink); }
+      .review-modal-v2 .rv-close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+      /* Loading state */
+      .review-modal-v2 .rv-loading {
+        padding: 64px 28px;
+        display: flex; flex-direction: column; align-items: center; gap: 12px;
+        color: var(--muted); font-size: 14px;
+      }
+      .review-modal-v2 .rv-loading .rv-spinner {
+        width: 28px; height: 28px; border-radius: 50%;
+        border: 2px solid var(--line); border-top-color: var(--accent);
+        animation: rvSpin 800ms linear infinite;
+      }
+      @keyframes rvSpin { to { transform: rotate(360deg); } }
+
+      /* Hero */
+      .review-modal-v2 .rv-hero {
+        position: relative; padding: 28px 28px 24px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, color-mix(in srgb, var(--lime) 6%, var(--panel)) 0%, var(--panel) 100%);
+      }
+      [data-theme="dark"] .review-modal-v2 .rv-hero {
+        background: linear-gradient(180deg, color-mix(in srgb, var(--lime) 9%, var(--panel)) 0%, var(--panel) 100%);
+      }
+      .review-modal-v2 .rv-hero-row {
+        display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
+      }
+      .review-modal-v2 .rv-score-big {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        padding: 8px 4px; min-width: 120px;
+      }
+      .review-modal-v2 .rv-score-num {
+        font-size: 72px; font-weight: 700; color: var(--lime);
+        letter-spacing: -0.04em; line-height: 0.95;
+        font-feature-settings: "tnum";
+      }
+      .review-modal-v2 .rv-score-num.warn { color: var(--warn); }
+      .review-modal-v2 .rv-score-num.danger { color: var(--danger); }
+      .review-modal-v2 .rv-score-num .of {
+        font-size: 24px; color: var(--muted-2); font-weight: 500; letter-spacing: 0;
+      }
+      .review-modal-v2 .rv-score-grade {
+        font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
+        font-weight: 600;
+        color: var(--lime);
+        background: var(--rv-good-soft);
+        border: 1px solid color-mix(in srgb, var(--lime) 28%, transparent);
+        padding: 3px 10px; border-radius: 5px; text-transform: uppercase;
+      }
+      .review-modal-v2 .rv-score-grade.warn {
+        color: var(--warn); background: var(--rv-warn-soft);
+        border-color: color-mix(in srgb, var(--warn) 28%, transparent);
+      }
+      .review-modal-v2 .rv-score-grade.danger {
+        color: var(--danger); background: var(--rv-danger-soft);
+        border-color: color-mix(in srgb, var(--danger) 28%, transparent);
+      }
+      .review-modal-v2 .rv-hero-msg {
+        display: flex; flex-direction: column; gap: 8px; min-width: 0;
+      }
+      .review-modal-v2 .rv-eyebrow {
+        font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+        letter-spacing: 0.16em; text-transform: uppercase;
+        display: inline-flex; align-items: center; gap: 6px; width: fit-content;
+        white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+      }
+      .review-modal-v2 .rv-eyebrow::before {
+        content: ""; width: 5px; height: 5px; border-radius: 50%;
+        background: var(--accent); flex-shrink: 0;
+      }
+      .review-modal-v2 .rv-headline {
+        font-size: 22px; font-weight: 600; color: var(--ink);
+        letter-spacing: -0.018em; line-height: 1.3;
+      }
+      .review-modal-v2 .rv-headline .ok { color: var(--lime); font-weight: 600; }
+      .review-modal-v2 .rv-headline .wn { color: var(--warn); font-weight: 600; }
+      .review-modal-v2 .rv-headline .er { color: var(--danger); font-weight: 600; }
+      .review-modal-v2 .rv-summary {
+        font-size: 14px; color: var(--ink-2); line-height: 1.5; max-width: 480px;
+      }
+      .review-modal-v2 .rv-summary b { color: var(--ink); font-weight: 600; }
+
+      /* Breakdown */
+      .review-modal-v2 .rv-breakdown {
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--line-2);
+        background: var(--panel);
+      }
+      .review-modal-v2 .rv-bd-cell {
+        padding: 14px 18px; border-right: 1px solid var(--line-2);
+        display: flex; flex-direction: column; gap: 8px;
+      }
+      .review-modal-v2 .rv-bd-cell:last-child { border-right: 0; }
+      .review-modal-v2 .rv-bd-cell .lbl {
+        font-size: 11.5px; color: var(--muted); font-weight: 500;
+      }
+      .review-modal-v2 .rv-bd-cell .val {
+        display: flex; align-items: baseline; gap: 6px;
+      }
+      .review-modal-v2 .rv-bd-cell .v {
+        font-size: 22px; font-weight: 600; color: var(--ink);
+        letter-spacing: -0.015em; font-feature-settings: "tnum";
+      }
+      .review-modal-v2 .rv-bd-cell .v.warn { color: var(--warn); }
+      .review-modal-v2 .rv-bd-cell .v.danger { color: var(--danger); }
+      .review-modal-v2 .rv-bd-cell .of {
+        font-size: 11px; color: var(--muted-2); font-family: var(--font-mono);
+      }
+      .review-modal-v2 .rv-bd-cell .bar {
+        height: 4px; border-radius: 2px; background: var(--line); overflow: hidden;
+      }
+      .review-modal-v2 .rv-bd-cell .bar .f {
+        height: 100%; background: var(--lime); border-radius: 2px;
+        transition: width .5s cubic-bezier(.2,.7,.2,1);
+      }
+      .review-modal-v2 .rv-bd-cell .bar .f.warn { background: var(--warn); }
+      .review-modal-v2 .rv-bd-cell .bar .f.danger { background: var(--danger); }
+
+      /* Body scroll area */
+      .review-modal-v2 .rv-body {
+        padding: 18px 22px 8px; overflow-y: auto;
+        display: flex; flex-direction: column; gap: 14px;
+      }
+      .review-modal-v2 .rv-sec-head {
+        display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+      }
+      .review-modal-v2 .rv-sec-head .t {
+        font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em;
+      }
+      .review-modal-v2 .rv-sec-head .ct {
+        font-family: var(--font-mono); font-size: 10.5px; color: var(--muted);
+        background: var(--panel-2); border: 1px solid var(--line-2);
+        padding: 1px 7px; border-radius: 5px; white-space: nowrap; flex-shrink: 0;
+      }
+
+      /* Issues */
+      .review-modal-v2 .rv-issues { display: flex; flex-direction: column; gap: 8px; }
+      .review-modal-v2 .rv-issue {
+        display: grid; grid-template-columns: auto 1fr auto;
+        gap: 14px; align-items: center;
+        padding: 14px 16px;
+        background: var(--panel); border: 1px solid var(--line);
+        border-radius: 11px;
+        transition: all .15s;
+      }
+      .review-modal-v2 .rv-issue:hover {
+        border-color: var(--muted-2);
+        box-shadow: var(--shadow-card);
+      }
+      .review-modal-v2 .rv-issue-icon {
+        width: 36px; height: 36px; border-radius: 9px;
+        display: grid; place-items: center; flex-shrink: 0;
+        font-size: 16px; font-weight: 700;
+      }
+      .review-modal-v2 .rv-issue.high .rv-issue-icon {
+        background: var(--rv-danger-soft); color: var(--danger);
+      }
+      .review-modal-v2 .rv-issue.med .rv-issue-icon {
+        background: var(--rv-warn-soft); color: var(--warn);
+      }
+      .review-modal-v2 .rv-issue.low .rv-issue-icon {
+        background: var(--rv-info-soft); color: var(--rv-info);
+      }
+      .review-modal-v2 .rv-issue-body {
+        min-width: 0; display: flex; flex-direction: column; gap: 4px;
+      }
+      .review-modal-v2 .rv-issue-title {
+        font-size: 14.5px; font-weight: 600; color: var(--ink);
+        letter-spacing: -0.005em; line-height: 1.35;
+        display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+      }
+      .review-modal-v2 .rv-issue-title .badge {
+        font-family: var(--font-mono); font-size: 9.5px;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        font-weight: 600; padding: 2px 6px; border-radius: 4px; flex-shrink: 0;
+      }
+      .review-modal-v2 .rv-issue.high .badge {
+        background: var(--rv-danger-soft); color: var(--danger);
+      }
+      .review-modal-v2 .rv-issue.med .badge {
+        background: var(--rv-warn-soft); color: var(--warn);
+      }
+      .review-modal-v2 .rv-issue.low .badge {
+        background: var(--rv-info-soft); color: var(--rv-info);
+      }
+      .review-modal-v2 .rv-issue-desc {
+        font-size: 13px; color: var(--ink-2); line-height: 1.5;
+      }
+      .review-modal-v2 .rv-issue-where {
+        font-size: 11.5px; color: var(--muted);
+        margin-top: 6px;
+        display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      }
+      .review-modal-v2 .rv-issue-where .pill {
+        display: inline-flex; align-items: center; gap: 4px;
+        background: var(--bg-2); border: 1px solid var(--line-2);
+        padding: 2px 7px; border-radius: 5px;
+        font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-2);
+      }
+      .review-modal-v2 .rv-issue-where .pill .dot {
+        width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
+      }
+      .review-modal-v2 .rv-issue-actions {
+        display: flex; flex-direction: column; gap: 6px;
+        align-items: flex-end; flex-shrink: 0;
+      }
+      .review-modal-v2 .rv-goto {
+        height: 30px; padding: 0 12px; border-radius: 8px;
+        font-size: 12px; font-weight: 500;
+        color: var(--ink-2); background: var(--panel-2);
+        border: 1px solid var(--line);
+        display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+        transition: all .12s;
+      }
+      .review-modal-v2 .rv-goto:hover {
+        border-color: var(--muted-2); color: var(--ink);
+      }
+      .review-modal-v2 .rv-goto svg {
+        width: 12px; height: 12px; stroke: currentColor; fill: none;
+        stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+      }
+
+      /* Strengths */
+      .review-modal-v2 .rv-strengths {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+      }
+      .review-modal-v2 .rv-str {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 12px;
+        background: var(--rv-good-soft);
+        border: 1px solid color-mix(in srgb, var(--lime) 22%, transparent);
+        border-radius: 9px;
+        font-size: 13px; color: var(--ink-2); line-height: 1.4;
+      }
+      .review-modal-v2 .rv-str .dt {
+        width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+        background: var(--lime); color: #fff;
+        display: grid; place-items: center;
+        font-size: 10px; font-weight: 700;
+      }
+      [data-theme="dark"] .review-modal-v2 .rv-str .dt { color: var(--bg); }
+
+      /* Empty state when no issues */
+      .review-modal-v2 .rv-empty {
+        padding: 18px 16px; text-align: center;
+        background: var(--rv-good-soft);
+        border: 1px solid color-mix(in srgb, var(--lime) 22%, transparent);
+        border-radius: 11px;
+        font-size: 13px; color: var(--ink-2);
+      }
+
+      /* Footer */
+      .review-modal-v2 .rv-foot {
+        border-top: 1px solid var(--line);
+        padding: 14px 22px;
+        display: flex; align-items: center; gap: 10px;
+        background: var(--bg-2);
+      }
+      .review-modal-v2 .rv-foot-meta {
+        font-family: var(--font-mono); font-size: 10.5px;
+        color: var(--muted); display: flex; gap: 10px;
+      }
+      .review-modal-v2 .rv-foot-meta b { color: var(--ink-2); font-weight: 500; }
+      .review-modal-v2 .rv-foot-sp { flex: 1; }
+      .review-modal-v2 .rv-btn-secondary {
+        height: 36px; padding: 0 14px; border-radius: 9px;
+        border: 1px solid var(--line); background: var(--panel);
+        color: var(--ink-2); font-size: 12.5px; font-weight: 500;
+        display: inline-flex; align-items: center; gap: 7px;
+        white-space: nowrap; transition: all .12s;
+      }
+      .review-modal-v2 .rv-btn-secondary:hover {
+        border-color: var(--muted-2); color: var(--ink);
+      }
+      .review-modal-v2 .rv-btn-primary {
+        height: 36px; padding: 0 18px; border-radius: 9px;
+        color: #fff; font-size: 13px; font-weight: 600;
+        display: inline-flex; align-items: center; gap: 8px;
+        white-space: nowrap;
+        background: linear-gradient(180deg, var(--accent-2), var(--accent));
+        box-shadow: var(--glow-accent);
+        transition: filter .12s, transform .12s;
+      }
+      .review-modal-v2 .rv-btn-primary:hover { filter: brightness(1.04); transform: translateY(-0.5px); }
+      .review-modal-v2 .rv-btn-primary .kbd {
+        font-family: var(--font-mono); font-size: 10px;
+        background: rgba(0,0,0,0.2); padding: 2px 6px;
+        border-radius: 3px; color: rgba(255,255,255,0.92);
+      }
+
+      /* Error state */
+      .review-modal-v2 .rv-error {
+        padding: 48px 28px; text-align: center;
+        color: var(--danger); font-size: 14px;
+      }
+
+      @media (max-width: 720px) {
+        .review-modal-v2 .rv-hero-row { grid-template-columns: 1fr; text-align: center; }
+        .review-modal-v2 .rv-score-big { align-items: center; }
+        .review-modal-v2 .rv-eyebrow { margin: 0 auto; }
+        .review-modal-v2 .rv-summary { margin: 0 auto; }
+        .review-modal-v2 .rv-breakdown { grid-template-columns: repeat(2, 1fr); }
+        .review-modal-v2 .rv-bd-cell:nth-child(2) { border-right: 0; }
+        .review-modal-v2 .rv-bd-cell:nth-child(1),
+        .review-modal-v2 .rv-bd-cell:nth-child(2) {
+          border-bottom: 1px solid var(--line-2);
+        }
+        .review-modal-v2 .rv-issue {
+          grid-template-columns: auto 1fr; gap: 10px;
+        }
+        .review-modal-v2 .rv-issue-actions {
+          grid-column: 1 / -1; flex-direction: row;
+          align-items: center; justify-content: flex-end;
+        }
+        .review-modal-v2 .rv-strengths { grid-template-columns: 1fr; }
+      }
     </style>
     <link rel="stylesheet" href="/editor-chrome.css" />
     <script>
@@ -7153,9 +7523,8 @@
         <button
           class="nav-bar-btn ghost nav-icon-btn"
           id="btn-review-deck"
-          title="Analyze presentation quality"
-          aria-label="Analyze presentation quality"
-          style="display: none"
+          title="프레젠테이션 품질 분석"
+          aria-label="프레젠테이션 품질 분석"
         >
           <svg
             width="16"
@@ -8978,96 +9347,86 @@
       </div>
     </div>
 
-    <!-- Review Panel (overlay) -->
+    <!-- Review Panel (overlay) — v2 redesign -->
     <div class="shortcuts-overlay" id="review-panel" hidden>
       <div
-        class="shortcuts-modal"
+        class="review-modal-v2"
+        id="review-modal-v2"
+        data-state="loading"
         role="dialog"
-        aria-label="Presentation review"
-        style="max-width: 480px; max-height: 80vh; overflow-y: auto"
+        aria-labelledby="review-headline"
       >
-        <span class="app-modal-eyebrow">review · ai feedback</span>
-        <h3 id="review-title">Presentation <em>review</em></h3>
-        <div
-          id="review-loading"
-          style="text-align: center; padding: 24px; color: var(--text-2)"
+        <button
+          class="rv-close"
+          id="review-close"
+          type="button"
+          title="닫기 (Esc)"
+          aria-label="닫기"
         >
-          Analyzing...
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Loading state -->
+        <div class="rv-loading" id="review-loading" role="status" aria-live="polite">
+          <div class="rv-spinner" aria-hidden="true"></div>
+          <div>분석 중…</div>
         </div>
-        <div id="review-content" hidden>
-          <!-- Score -->
-          <div style="text-align: center; margin: 16px 0">
-            <div
-              style="font-size: 32px; font-weight: 700; color: var(--text-0)"
-              id="review-grade"
-            ></div>
-            <div
-              style="font-size: 13px; color: var(--text-2)"
-              id="review-score-text"
-            ></div>
-            <div
-              id="review-bar"
-              style="
-                height: 6px;
-                background: var(--surface-2);
-                border-radius: 3px;
-                margin-top: 8px;
-                overflow: hidden;
-              "
-            >
-              <div
-                id="review-bar-fill"
-                style="
-                  height: 100%;
-                  background: var(--accent);
-                  border-radius: 3px;
-                  transition: width 0.5s;
-                "
-              ></div>
+
+        <!-- Error state -->
+        <div class="rv-error" id="review-error" role="alert"></div>
+
+        <!-- Hero -->
+        <div class="rv-hero">
+          <div class="rv-hero-row">
+            <div class="rv-score-big">
+              <div class="rv-score-num" id="review-score-num">
+                <span id="review-score-value">—</span><span class="of">/100</span>
+              </div>
+              <div class="rv-score-grade" id="review-score-grade">Grade —</div>
+            </div>
+            <div class="rv-hero-msg">
+              <span class="rv-eyebrow" id="review-eyebrow">AI 리뷰</span>
+              <div class="rv-headline" id="review-headline">분석 결과를 불러오는 중입니다.</div>
+              <div class="rv-summary" id="review-summary"></div>
             </div>
           </div>
-          <!-- Categories -->
-          <div
-            id="review-categories"
-            style="
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 8px;
-              margin-bottom: 16px;
-            "
-          ></div>
-          <!-- Issues -->
-          <div id="review-issues-section" hidden>
-            <h4
-              style="font-size: 13px; color: var(--text-2); margin-bottom: 8px"
-            >
-              Issues
-            </h4>
-            <div
-              id="review-issues"
-              style="display: flex; flex-direction: column; gap: 6px"
-            ></div>
+        </div>
+
+        <!-- Breakdown -->
+        <div class="rv-breakdown" id="review-breakdown"></div>
+
+        <!-- Body -->
+        <div class="rv-body">
+          <div id="review-issues-section">
+            <div class="rv-sec-head">
+              <span class="t">고쳐보면 좋을 부분</span>
+              <span class="ct" id="review-issues-count">0개</span>
+            </div>
+            <div class="rv-issues" id="review-issues"></div>
+            <div class="rv-empty" id="review-issues-empty" hidden>
+              지적할 만한 이슈가 없어요. 그대로 사용해도 좋습니다.
+            </div>
           </div>
-          <!-- Strengths -->
-          <div id="review-strengths-section" hidden style="margin-top: 12px">
-            <h4
-              style="font-size: 13px; color: var(--text-2); margin-bottom: 8px"
-            >
-              Strengths
-            </h4>
-            <div
-              id="review-strengths"
-              style="display: flex; flex-direction: column; gap: 4px"
-            ></div>
+
+          <div id="review-strengths-section">
+            <div class="rv-sec-head">
+              <span class="t">잘된 점</span>
+              <span class="ct" id="review-strengths-count">0개</span>
+            </div>
+            <div class="rv-strengths" id="review-strengths"></div>
           </div>
         </div>
-        <button
-          class="shortcuts-close"
-          id="review-close"
-          style="margin-top: 16px"
-        >
-          Close
-        </button>
+
+        <!-- Footer -->
+        <div class="rv-foot">
+          <span class="rv-foot-meta" id="review-foot-meta"></span>
+          <span class="rv-foot-sp"></span>
+          <button class="rv-btn-primary" id="review-close-foot" type="button">
+            닫기 <span class="kbd">Esc</span>
+          </button>
+        </div>
       </div>
     </div>
 

@@ -38,11 +38,6 @@ const ACTIONS = [
     run: () => document.querySelector('#btn-review-outline')?.click(),
   },
   {
-    id: 'review-deck', group: 'Actions',
-    name: 'Review deck', hint: 'AI 덱 리뷰', kbd: '',
-    run: () => document.querySelector('#btn-review-deck')?.click(),
-  },
-  {
     id: 'retheme', group: 'Actions',
     name: 'Retheme deck', hint: '다른 팩으로 리디자인', kbd: '',
     run: () => document.querySelector('#btn-retheme')?.click(),
