@@ -86,6 +86,35 @@ export function createGenerateRouter(ctx) {
     res.json({ runId, topic: (topic || '').trim(), model: selectedModel, deckPath: resolvedDeckPath });
 
     (async () => {
+      const reportedSlides = new Set();
+      const fireSlideGenerated = (slideIndex) => {
+        if (!Number.isFinite(slideIndex) || slideIndex < 1) return;
+        if (reportedSlides.has(slideIndex)) return;
+        reportedSlides.add(slideIndex);
+        broadcastSSE(ctx.sseClients, 'generated', {
+          runId, slideIndex, completed: reportedSlides.size,
+        });
+      };
+      const pollSlideFiles = async () => {
+        const dir = ctx.getSlidesDir();
+        if (!dir) return;
+        try {
+          const files = await listSlideFiles(dir);
+          for (const f of files) {
+            const m = f.match(/slide-(\d+)\.html/i);
+            if (!m) continue;
+            const idx = parseInt(m[1], 10);
+            if (reportedSlides.has(idx)) continue;
+            try {
+              const content = await readFile(join(dir, f), 'utf-8');
+              if (content.length > 100 && (/<body[\s>]/i.test(content) || /<html[\s>]/i.test(content))) {
+                fireSlideGenerated(idx);
+              }
+            } catch { /* not yet readable / partial write */ }
+          }
+        } catch { /* dir not ready */ }
+      };
+      const slidePollTimer = setInterval(pollSlideFiles, 500);
       try {
         const slidesDir = resolvedDeckPath;
         let result;
@@ -136,9 +165,7 @@ export function createGenerateRouter(ctx) {
                 broadcastSSE(ctx.sseClients, 'progress', { runId, phase: 'generate', step });
               },
               onBatchLog: (_idx, stream, chunk) => onLog(stream, chunk),
-              onSlideReady: (slideIndex, completed) => {
-                broadcastSSE(ctx.sseClients, 'generated', { runId, slideIndex, completed });
-              },
+              onSlideReady: (slideIndex) => fireSlideGenerated(slideIndex),
             });
           } else {
             const fullPrompt = buildFromOutlinePromptFull(outlineContent, genPackId, slidesDir, { useImages: !!useImages, availableAssets });
@@ -249,6 +276,8 @@ export function createGenerateRouter(ctx) {
         });
         broadcastSSE(ctx.sseClients, 'generateFinished', { runId, success: false, cancelled, message, slideCount: 0 });
       } finally {
+        clearInterval(slidePollTimer);
+        await pollSlideFiles();
         ctx.clearActiveAIRun(runId);
         ctx.generateMutex.release();
       }

@@ -656,24 +656,26 @@
         </div>
 
         <div class="gen-footer">
-          <button class="cancel-btn" id="btn-cancel">
+          <button class="cancel-btn" id="btn-cancel" title="진행 중인 작업을 버립니다">
             <svg class="ico" viewBox="0 0 24 24">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
             취소
           </button>
-          <span class="tip"
-            >백그라운드로 돌려두면 다른 덱 작업하면서 기다릴 수 있어요.</span
-          >
-          <a class="bg-btn" href="/">
-            <svg class="ico" viewBox="0 0 24 24">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-            </svg>
-            갤러리에서 계속 기다리기
-          </a>
+          <div class="bg-action">
+            <span class="bg-tip"
+              >백그라운드로 돌려두면 다른 덱 작업하면서 기다릴 수 있어요.</span
+            >
+            <a class="bg-btn" href="/">
+              <svg class="ico" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+              </svg>
+              갤러리에서 계속 기다리기
+            </a>
+          </div>
         </div>
       </div>
 
@@ -1947,13 +1949,19 @@
       }
 
       function detectPlanSubstage(step) {
-        const s = (step || "").toString();
-        if (/draft|초안|final|finaliz|정돈|마무리|note|제목/i.test(s)) return 4;
-        if (/sequen|order|arrange|배치|순서|리듬|flow/i.test(s)) return 3;
-        if (/structur|section|outline|sections|구조|섹션|배열/i.test(s))
-          return 2;
-        if (/analy|topic|understand|parse|분석|이해|분해|주제/i.test(s))
-          return 1;
+        const s = (step || "").toString().toLowerCase();
+        // deterministic mapping to actual server messages
+        // emitted by routes/plan.js (POST /api/plan):
+        //   "Analyzing topic and structuring outline"  → 1 ANALYZE
+        //   "Generating outline with AI"               → 2 STRUCTURE
+        //   "Drafting outline structure" (poller, 0)   → 2 STRUCTURE
+        //   "Draft N slide title(s)"     (poller, ≥1)  → 4 DRAFT
+        //   "Parsing generated outline"                → 4 DRAFT (finalizing)
+        if (s.includes("parsing")) return 4;
+        if (s.startsWith("draft ") && /\d/.test(s)) return 4;
+        if (s.includes("drafting outline structure")) return 2;
+        if (s.includes("generating outline")) return 2;
+        if (s.includes("analyzing")) return 1;
         return 0;
       }
 
@@ -2699,6 +2707,10 @@
         const n = S.outline?.slides?.length || S.slideCount;
         S.slideCount = n;
         $("gen-count").textContent = n;
+        $("slide-cur").textContent = `0 / ${n}`;
+        $("bar-fill").style.width = "0%";
+        // outline은 plan phase에서 완료된 상태 — step-01 done, step-02 active로 시작
+        setGenStep(2);
         $("gen-lang").textContent =
           S.lang === "ko" ? "한국어" : S.lang === "en" ? "English" : "Auto";
         $("gen-tone").textContent = {
@@ -2808,11 +2820,35 @@
               return;
             }
             appendLog(d.step || d.message || "", d.phase, "ok");
-            // map phases to step cards (generate view)
-            if (/outline/i.test(d.step || "")) setGenStep(1);
-            else if (/layout|pack/i.test(d.step || "")) setGenStep(2);
-            else if (/content|slide/i.test(d.step || "")) setGenStep(3);
-            else if (/image|finish|polish/i.test(d.step || "")) setGenStep(4);
+            // step card mapping — deterministic match to actual server messages
+            // emitted by routes/generate.js + parallel-generate.js.
+            const stepText = (d.step || d.message || "").toLowerCase();
+            if (stepText.includes("finalizing")) {
+              setGenStep(4);
+            } else if (
+              stepText.includes("splitting") ||
+              stepText.includes("starting batch") ||
+              stepText.includes("batch ") ||
+              stepText.includes("building")
+            ) {
+              setGenStep(3);
+              const bm = stepText.match(/batch\s+(\d+)\s*\/\s*(\d+)/);
+              if (bm) {
+                const cur = parseInt(bm[1], 10) - 1;
+                const tot = parseInt(bm[2], 10) || 1;
+                const pct = Math.min(95, Math.max(5, (cur / tot) * 100));
+                const bar = $("bar-fill");
+                if (bar && parseFloat(bar.style.width || "0") < pct) {
+                  bar.style.width = `${pct}%`;
+                }
+              }
+            } else if (
+              stepText.includes("backed up") ||
+              stepText.includes("preparing") ||
+              stepText.includes("image")
+            ) {
+              setGenStep(2);
+            }
           } catch {}
         });
         es.addEventListener("generateLog", (e) => {
