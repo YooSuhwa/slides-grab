@@ -56,15 +56,16 @@ function reviewBuildBreakdown(categories) {
       if (!cat) return '';
       const score = Math.max(0, Math.min(100, Math.round(cat.score ?? 0)));
       const tone = reviewToneClass(score);
+      const cls = tone ? ` ${tone}` : '';
       const label = REVIEW_CATEGORY_LABELS[key] || cat.label || key;
       return `
         <div class="rv-bd-cell">
           <div class="lbl">${escapeHtml(label)}</div>
           <div class="val">
-            <span class="v${tone ? ' ' + tone : ''}">${score}</span>
+            <span class="v${cls}">${score}</span>
             <span class="of">/100</span>
           </div>
-          <div class="bar"><div class="f${tone ? ' ' + tone : ''}" style="width:${score}%"></div></div>
+          <div class="bar"><div class="f${cls}" style="width:${score}%"></div></div>
         </div>`;
     })
     .join('');
@@ -209,14 +210,10 @@ if (reviewBtn && reviewPanel) {
   });
 
   reviewPanel.addEventListener('click', (e) => {
-    const target = e.target instanceof Element ? e.target : null;
     if (e.target === reviewPanel) { reviewClosePanel(); return; }
-    if (!target) return;
-    if (target.closest('#review-close') || target.closest('#review-close-foot')) {
-      reviewClosePanel();
-      return;
-    }
-    const goto = target.closest('[data-slide-index]');
+    if (!(e.target instanceof Element)) return;
+    if (e.target.closest('#review-close, #review-close-foot')) { reviewClosePanel(); return; }
+    const goto = e.target.closest('[data-slide-index]');
     if (goto instanceof HTMLElement) {
       const idx = parseInt(goto.dataset.slideIndex || '', 10);
       reviewClosePanel();
