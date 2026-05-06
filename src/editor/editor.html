@@ -7338,7 +7338,13 @@
       .review-modal-v2 .rv-error {
         padding: 48px 28px; text-align: center;
         color: var(--danger); font-size: 14px;
+        display: flex; flex-direction: column; align-items: center; gap: 12px;
       }
+      .review-modal-v2 .rv-retry-btn {
+        padding: 6px 16px; border-radius: 6px; font-size: 13px; cursor: pointer;
+        background: var(--panel-2); border: 1px solid var(--muted); color: var(--ink);
+      }
+      .review-modal-v2 .rv-retry-btn:hover { background: var(--muted); }
 
       @media (max-width: 720px) {
         .review-modal-v2 .rv-hero-row { grid-template-columns: 1fr; text-align: center; }
@@ -9375,7 +9381,10 @@
         </div>
 
         <!-- Error state -->
-        <div class="rv-error" id="review-error" role="alert"></div>
+        <div class="rv-error" role="alert">
+          <p id="review-error-text"></p>
+          <button id="review-retry" type="button" class="rv-retry-btn">다시 시도</button>
+        </div>
 
         <!-- Hero -->
         <div class="rv-hero">
